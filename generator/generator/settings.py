@@ -37,6 +37,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # Custom
     'account.apps.AccountConfig',
+    'questions.apps.QuestionsConfig',
 
     # Third parties
 
