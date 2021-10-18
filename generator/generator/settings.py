@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     # Custom
     'account.apps.AccountConfig',
     'questions.apps.QuestionsConfig',
+    'tests.apps.TestsConfig',
 
     # Third parties
 
