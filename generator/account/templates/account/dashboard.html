@@ -3,6 +3,63 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-    <h1>Dashboard</h1>
-    <p>Tu na razie jest ściernisko...</p>
+    <section class="vh-100 gradient-custom container-fluid">
+        <h1 class="text-light text-center pt-4">
+            My Subjects
+        </h1>
+        {#    Tutaj kafelki z przedmiotami + kafelek do dodwania przedmiotu    #}
+        <div class="container">
+
+            <div class="row my-3">
+
+                <div class="card col-md-4 bg-dark text-light mx-2 my-3 py-2">
+                    <div class="card-body">
+                        <h5 class="card-title">Add Subject</h5>
+                        <p class="card-text text-center">
+                            <a href="#">
+                                <i class="fas fa-plus fa-5x mt-4"></i>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card col-md-4 bg-dark text-light mx-2 my-3 py-2">
+                    <div class="card-body">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">
+                            Some quick example text to build on the card title and make up the bulk of the
+                            card's content.
+                        </p>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-8">
+                                    <button type="button" class="btn btn-primary">See Questions</button>
+                                </div>
+                                <div class="col-4 nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" role="button" id="sub-menu"
+                                       data-mdb-toggle="dropdown">
+                                        More
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a href="#" class="dropdown-item btn btn-info">
+                                                Edit Subject
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="dropdown-item btn btn-danger">
+                                                Delete Subject
+                                            </a>
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
 {% endblock %}
