@@ -75,6 +75,15 @@
                                         <label class="form-label" for="password2">Repeat password</label>
                                     </div>
 
+                                    <p class="text-danger">
+                                        {% for e in form.captcha.errors %}
+                                            {{ e }}
+                                        {% endfor %}
+                                    </p>
+                                    <div class="mb-4">
+                                        {{ form.captcha }}
+                                    </div>
+
                                     {% csrf_token %}
                                     <button class="btn btn-outline-light btn-lg px-5" type="submit">Create Account</button>
 
@@ -88,4 +97,5 @@
             </div>
         </div>
     </section>
+
 {% endblock %}

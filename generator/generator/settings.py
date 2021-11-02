@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'tests.apps.TestsConfig',
 
     # Third parties
+    'captcha',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -157,3 +158,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = config['EMAIL_HOST_PASSWORD']
 
+# Recaptcha
+RECAPTCHA_PUBLIC_KEY = config['RECAPTCHA_PUBLIC_KEY']
+RECAPTCHA_PRIVATE_KEY = config['RECAPTCHA_PRIVATE_KEY']

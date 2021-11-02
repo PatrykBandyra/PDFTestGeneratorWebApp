@@ -5,6 +5,8 @@ from django.contrib.auth.forms import (AuthenticationForm,
                                        PasswordResetForm,
                                        SetPasswordForm,
                                        UserCreationForm)
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV2Checkbox
 
 
 class CustomLoginForm(AuthenticationForm):
@@ -56,6 +58,7 @@ class CustomUserCreationForm(UserCreationForm):
     """
     Adds some classes to default UserCreationForm fields and decides which specific User model fields to show in a form.
     """
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={'data-theme': 'dark'}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
