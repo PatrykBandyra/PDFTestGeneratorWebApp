@@ -7,10 +7,10 @@
         <h1 class="text-light text-center pt-4">
             My Subjects
         </h1>
-        {#    Tutaj kafelki z przedmiotami + kafelek do dodwania przedmiotu    #}
-        <div class="container">
 
-            <div class="row my-3">
+        <div class="container mx-auto px-auto">
+
+            <div class="row my-3 row-cols-1 row-cols-md-2 pb-3">
                 <div class="card col-md-12 bg-dark text-light my-3 py-2">
                     <div class="card-body">
                         <h5 class="card-title text-center">Add Subject</h5>
@@ -23,20 +23,21 @@
                 </div>
             </div>
 
-            <div class="row row-cols-1 row-cols-md-2 g-4 pb-3">
+            <div class="row row-cols-1 row-cols-md-2 g-4 pb-3 px-auto mx-auto">
                 {% for subject in subjects %}
 
                     <div class="col-md-4 px-2">
-                        <div class="card bg-dark text-light">
-                            <div class="card-body">
+                        <div class="card h-100 bg-dark text-light">
+                            <div class="card-body position-relative mb-3">
                                 <h5 class="card-title">{{ subject.name }}</h5>
-                                <p class="card-text">
+                                <p class="card-text pb-4">
                                     {{ subject.description }}
                                 </p>
-                                <div class="container">
+
+                                <div class="container position-absolute bottom-0">
                                     <div class="row">
                                         <div class="col-8">
-                                            <button type="button" class="btn btn-primary">See Questions</button>
+                                            <a href="#" class="btn btn-primary">See Questions</a>
                                         </div>
                                         <div class="col-4 nav-item dropdown">
                                             <a class="nav-link dropdown-toggle" role="button" id="sub-menu"
@@ -62,7 +63,6 @@
                             </div>
                         </div>
                     </div>
-
 
 
                 {% endfor %}
