@@ -1,3 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
+
+def subject(request, user_id, subject_name):
+    return render(request, 'questions/subject.html', {})
