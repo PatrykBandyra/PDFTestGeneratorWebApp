@@ -3,5 +3,7 @@ from . import views
 
 app_name = 'questions'
 urlpatterns = [
-    path('<int:user_id>/<slug:subject_name>', views.subject, name='subject'),
+    path('subject/create/', views.create_subject, name='subject-create'),
+    path('subject/<int:subject_id>/<slug:subject_slug>/edit', views.edit_subject, name='subject-edit'),
+    path('seubject/<int:subject_id>/<slug:subject_slug>/', views.subject, name='subject'),
 ]

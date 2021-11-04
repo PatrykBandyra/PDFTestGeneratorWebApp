@@ -77,32 +77,6 @@ class SubjectModelTests(TestCase):
             exception_raised = True
         self.assertTrue(exception_raised)
 
-    def test_unique_together_different_authors(self):
-        """
-        Tests if different authors can have subjects with the same name.
-        Success if they can.
-        """
-        exception_raised = False
-        Subject.objects.create(name='A', author=self.user)
-        try:
-            Subject.objects.create(name='A', author=self.user2)
-        except IntegrityError:
-            exception_raised = True
-        self.assertFalse(exception_raised)
-
-    def test_unique_together_different_names(self):
-        """
-        Tests if an author can have 2 subjects with different names.
-        Success if user can.
-        """
-        exception_raised = False
-        Subject.objects.create(name='B', author=self.user)
-        try:
-            Subject.objects.create(name='C', author=self.user)
-        except IntegrityError:
-            exception_raised = True
-        self.assertFalse(exception_raised)
-
     def test_multiple_ownership_of_subject(self):
         """
         Tests if 2 users (author and other) can own subject and access it.

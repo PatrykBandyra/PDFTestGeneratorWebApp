@@ -15,7 +15,7 @@
                     <div class="card-body">
                         <h5 class="card-title text-center">Add Subject</h5>
                         <p class="card-text text-center">
-                            <a href="#">
+                            <a href="{% url 'questions:subject-create' %}">
                                 <i class="fas fa-plus fa-5x mt-4"></i>
                             </a>
                         </p>
@@ -30,6 +30,9 @@
                         <div class="card h-100 bg-dark text-light">
                             <div class="card-body position-relative mb-3">
                                 <h5 class="card-title">{{ subject.name }}</h5>
+                                <p class="small text-muted">
+                                    Created by {{ subject.author.username }}
+                                </p>
                                 <p class="card-text pb-4">
                                     {{ subject.description }}
                                 </p>
@@ -40,20 +43,24 @@
                                             <a href="#" class="btn btn-primary">See Questions</a>
                                         </div>
                                         <div class="col-4 nav-item dropdown">
-                                            <a class="nav-link dropdown-toggle" role="button" id="sub-menu"
+                                            <a class="nav-link dropdown-toggle {% if subject not in authorial_subjects %}disabled{% endif %}"
+                                               role="button" id="sub-menu"
                                                data-mdb-toggle="dropdown">
                                                 More
                                             </a>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <a href="#" class="dropdown-item btn btn-info">
+                                                    <a href="{% url 'questions:subject-edit' subject.id subject.slug %}"
+                                                       class="dropdown-item btn btn-info">
                                                         Edit Subject
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a href="#" class="dropdown-item btn btn-danger">
+                                                    <button type="button" data-mdb-toggle="modal"
+                                                            data-mdb-target="#delete{{ subject.id }}"
+                                                            class="dropdown-item btn btn-danger">
                                                         Delete Subject
-                                                    </a>
+                                                    </button>
                                                 </li>
                                             </ul>
 
@@ -64,12 +71,34 @@
                         </div>
                     </div>
 
+                    <div class="modal" tabindex="-1" role="dialog" id="delete{{ subject.id }}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Delete Subject</h5>
+                                    <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete {{ subject.name }}?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="delete" value="{{ subject.id }}">
+                                        <button type="submit" class="btn btn-danger">Yes, delete</button>
+                                    </form>
+                                    <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
+                                        No, cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 {% endfor %}
 
             </div>
         </div>
-        {#            </div>#}
-        {#        </div>#}
+
     </section>
 {% endblock %}

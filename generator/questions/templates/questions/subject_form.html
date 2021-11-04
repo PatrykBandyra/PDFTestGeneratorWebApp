@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section class="vh-100 gradient-custom">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card bg-dark text-white" style="border-radius: 1rem;">
+                        <div class="card-body p-5 text-center">
+
+                            <div class="mb-md-5 mt-md-4 pb-5">
+
+                                <h2 class="fw-bold mb-2 text-uppercase">
+                                    {% if  section == 'create_subject' %}
+                                        Create New Subject
+                                    {% else %}
+                                        Update Subject
+                                    {% endif %}
+                                </h2>
+
+                                <p class="text-white-50 mb-5">
+                                    {% if  section == 'create_subject' %}
+                                        Please fill in the form to add new subject.
+                                    {% else %}
+                                        Please fill in the form to update a subject.
+                                    {% endif %}
+                                </p>
+
+                                <form method="post">
+
+                                    <p class="text-danger">
+                                        {% for e in subject_form.name.errors %}
+                                            {{ e }}
+                                        {% endfor %}
+                                    </p>
+                                    <div class="form-outline form-white mb-4">
+                                        {{ subject_form.name }}
+                                        <label class="form-label" for="name">Subject Name</label>
+                                    </div>
+
+                                    <p class="text-danger">
+                                        {% for e in subject_form.description.errors %}
+                                            {{ e }}
+                                        {% endfor %}
+                                    </p>
+                                    <div class="form-outline form-white mb-4">
+                                        {{ subject_form.description }}
+                                        <label class="form-label" for="description">Description (optional)</label>
+                                    </div>
+
+                                    {% csrf_token %}
+                                    <button class="btn btn-outline-light btn-lg px-5" type="submit">
+                                        {% if  section == 'create_subject' %}
+                                            Create Subject
+                                        {% else %}
+                                            Update Subject
+                                        {% endif %}
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

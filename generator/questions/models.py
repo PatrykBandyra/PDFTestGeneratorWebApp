@@ -17,9 +17,6 @@ class Subject(models.Model):
         super(Subject, self).__init__(*args, **kwargs)
         self.__original_name = self.name
 
-    class Meta:
-        unique_together = ('author', 'name')
-
     def __str__(self):
         return self.name
 
@@ -30,7 +27,7 @@ class Subject(models.Model):
         super(Subject, self).save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('questions:subject', args=[self.author.id, self.slug])
+        return reverse('questions:subject', args=[self.id, self.slug])
 
 
 class Question(models.Model):
