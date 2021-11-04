@@ -5,17 +5,27 @@ from django.utils.text import slugify
 
 
 class Subject(models.Model):
-    name = models.CharField(max_length=100)  # Only name required in a form
-    slug = models.SlugField(blank=True, null=False)
-    ownership = models.ManyToManyField(User, related_name='subjects_owned', blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subjects_created')
-    description = models.CharField(max_length=250, null=True, blank=True)
+    name = models.CharField(max_length=100)  # Only field required in form
+    slug = models.SlugField(blank=True)  # Generated automatically on creation
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subjects_owned')
+    ownership = models.ManyToManyField(User, related_name='subjects')
+    description = models.CharField(max_length=250, blank=True)
+
+    __original_name = None
+
+    def __init__(self, *args, **kwargs):
+        super(Subject, self).__init__(*args, **kwargs)
+        self.__original_name = self.name
+
+    class Meta:
+        unique_together = ('author', 'name')
 
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.id:  # Create slug only when object is being created
+        # Create slug only when object is being created or name has been updated
+        if not self.id or self.name != self.__original_name:
             self.slug = slugify(self.name)
         super(Subject, self).save(*args, **kwargs)
 
