@@ -26,7 +26,7 @@
             <div class="row row-cols-1 row-cols-md-2 g-4 pb-3 px-auto mx-auto">
                 {% for subject in subjects %}
 
-                    <div class="col-md-4 px-2">
+                    <div class="col-md-6 col-xl-4 px-2">
                         <div class="card h-100 bg-dark text-light">
                             <div class="card-body position-relative mb-3">
                                 <h5 class="card-title">{{ subject.name }}</h5>
@@ -39,8 +39,8 @@
 
                                 <div class="container position-absolute bottom-0">
                                     <div class="row">
-                                        <div class="col-8">
-                                            <a href="#" class="btn btn-primary">See Questions</a>
+                                        <div class="col-8 col-md-8 me-auto">
+                                            <a href="{{ subject.get_absolute_url }}" class="btn btn-primary">See Questions</a>
                                         </div>
                                         <div class="col-4 nav-item dropdown">
                                             <a class="nav-link dropdown-toggle {% if subject not in authorial_subjects %}disabled{% endif %}"

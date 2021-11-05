@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.utils import IntegrityError
-from .forms import SubjectCreationForm
+from .forms import SubjectCreationForm, TestForm
 from .models import Subject
 
 
@@ -38,5 +38,5 @@ def edit_subject(request, subject_id, subject_slug):
 
 
 @login_required
-def subject(request, user_id, subject_slug):
-    return render(request, 'questions/subject_questions.html', {})
+def subject(request, subject_id, subject_slug):
+    return render(request, 'questions/subject_questions.html', {'form': TestForm()})

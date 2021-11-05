@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
+from ckeditor.fields import RichTextField
 
 
 class Subject(models.Model):
@@ -31,11 +32,18 @@ class Subject(models.Model):
 
 
 class Question(models.Model):
-    question = models.TextField(max_length=1000)
-    # usage
+    question = RichTextField(max_length=5000)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='questions')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='questions')
+    created = models.DateTimeField(auto_now_add=True)
+    last_use = models.DateTimeField()
     # tags
-    # code_snippet
-    # author =
+
+    class Meta:
+        ordering = ('-created',)
+
+    def __str__(self):
+        return f'ID: {self.id}, AUTHOR: {self.author.username}'
 
 
 class Answer(models.Model):
