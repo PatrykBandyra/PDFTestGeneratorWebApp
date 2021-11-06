@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from questions.models import Subject
 
 from account.forms import CustomChangePasswordForm
+from questions.utils import is_author_of_subject
 
 
 @login_required
@@ -12,10 +13,14 @@ def dashboard(request):
     # Subject deletion
     if request.method == 'POST':
         try:
+            # Check if user is an author of a subject - only author can delete subject
             subject_id = int(request.POST.get('delete'))
+            if not is_author_of_subject(request.user, subject_id):
+                raise Exception
+
             Subject.objects.filter(id=subject_id).delete()
         except Exception:
-            pass
+            return redirect('account:dashboard')
 
     subjects = Subject.objects.filter(ownership=request.user)
     authorial_subjects = Subject.objects.filter(author=request.user)

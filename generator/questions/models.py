@@ -47,4 +47,13 @@ class Question(models.Model):
 
 
 class Answer(models.Model):
-    pass
+    answer = RichTextField(max_length=1000)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='answers')
+    is_right = models.BooleanField(default=False)
+    order = models.IntegerField()
+
+    def __str__(self):
+        return f'ID: {self.id}, QUESTION ID: {self.question.id}'
+
+    class Meta:
+        unique_together = ('question', 'order')

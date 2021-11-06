@@ -109,3 +109,8 @@ class SubjectModelTests(TestCase):
         expected_url = reverse('questions:subject', args=[self.user.id, slugify(subject.name)])
         self.assertEqual(expected_url, subject.get_absolute_url())
 
+
+class QuestionModelTest(TestCase):
+    def __init__(self):
+        pass
+

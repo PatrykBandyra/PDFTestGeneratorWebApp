@@ -1,6 +1,6 @@
 from django import forms
 from ckeditor.fields import RichTextFormField
-from .models import Subject
+from .models import Subject, Question
 
 
 class SubjectCreationForm(forms.ModelForm):
@@ -18,4 +18,9 @@ class SubjectCreationForm(forms.ModelForm):
 
 class TestForm(forms.Form):
     text = RichTextFormField()
-    text2 = forms.CharField(max_length=25)
+
+
+class QuestionCreationForm(forms.ModelForm):
+    class Meta:
+        model = Question
+        fields = ('question',)

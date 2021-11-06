@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.utils import IntegrityError
-from .forms import SubjectCreationForm, TestForm
+from django.core.exceptions import PermissionDenied
+from .forms import SubjectCreationForm, TestForm, QuestionCreationForm
 from .models import Subject
+from .utils import is_author_of_subject, is_owner_of_subject
 
 
 @login_required
@@ -23,6 +25,10 @@ def create_subject(request):
 
 @login_required
 def edit_subject(request, subject_id, subject_slug):
+    # Check if user is an author of a subject - only author can edit a subject (name, description)
+    if not is_author_of_subject(request.user, subject_id):
+        return redirect('account:dashboard')
+
     if request.method == 'POST':
         subject_form = SubjectCreationForm(data=request.POST)
         if subject_form.is_valid():
@@ -39,4 +45,14 @@ def edit_subject(request, subject_id, subject_slug):
 
 @login_required
 def subject(request, subject_id, subject_slug):
-    return render(request, 'questions/subject_questions.html', {'form': TestForm()})
+    # Check if user is an owner of a subject - only owners can access the subject's questions
+    if not is_owner_of_subject(request.user, subject_id):
+        return redirect('account:dashboard')
+
+    questions = get_object_or_404(Subject, id=subject_id).questions.all()
+    return render(request, 'questions/subject_questions.html', {'questions': questions, 'form': TestForm()})
+
+
+@login_required
+def create_question(request, subject_id, subject_slug):
+    return render(request, 'questions/question_form.html', {'form': QuestionCreationForm()})
