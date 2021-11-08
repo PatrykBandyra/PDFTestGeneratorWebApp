@@ -5,61 +5,61 @@
 {% endblock %}
 
 {% block content %}
-    {#    <section class="min-vh-100 gradient-custom container-fluid">#}
-    {#        <h1 class="text-light text-center pt-4">#}
-    {#            Subject Name#}
-    {#        </h1>#}
-    {##}
-    {#        <div class="container mx-auto px-auto">#}
-    {##}
-    {#            <div class="row my-3 row-cols-1 row-cols-md-2 pb-3">#}
-    {#                <div class="card col-md-12 bg-dark text-light my-3 py-2">#}
-    {#                    <div class="card-body">#}
-    {#                        <h5 class="card-title text-center">Add Question</h5>#}
-    {#                        <p class="card-text text-center">#}
-    {#                            <a href="{% url 'questions:subject-create' %}">#}
-    {#                                <i class="fas fa-plus fa-5x mt-4"></i>#}
-    {#                            </a>#}
-    {#                        </p>#}
-    {#                    </div>#}
-    {#                </div>#}
-    {#            </div>#}
-    {##}
-    {#            <div class="accordion" id="accordionPanelsStayOpen">#}
-    {##}
-    {#                {% for question in questions %}#}
-    {##}
-    {#                    <div class="accordion-item bg-dark text-light">#}
-    {#                        <h2 class="accordion-header" id="heading{{ question.id }}">#}
-    {#                            <button class="accordion-button bg-dark text-light" type="button" data-mdb-toggle="collapse"#}
-    {#                                    data-mdb-target="#panelsStayOpen-collapse{{ subject.id }}">#}
-    {#                                {{ question.question|safe}}#}
-    {#                            </button>#}
-    {#                            <button class="btn btn-success">#}
-    {#                                Edit Question#}
-    {#                            </button>#}
-    {#                        </h2>#}
-    {#                        <div id="panelsStayOpen-collapse{{ subject.id }}" class="accordion-collapse collapse">#}
-    {#                            <div class="accordion-body">#}
-    {##}
-    {#                                {% for answer in question.answers.all %}#}
-    {#                                    {{ answer|safe }}#}
-    {#                                {% endfor %}#}
-    {##}
-    {#                            </div>#}
-    {#                        </div>#}
-    {#                    </div>#}
-    {##}
-    {#                {% endfor %}#}
-    {##}
-    {##}
-    {#                <form method="post">#}
-    {#                    {{ form.media }}#}
-    {#                    {{ form.as_p }}#}
-    {#                </form>#}
-    {#            </div>#}
-    {#        </div>#}
-    {#    </section>#}
+        <section class="min-vh-100 gradient-custom container-fluid">
+            <h1 class="text-light text-center pt-4">
+                Subject Name
+            </h1>
+
+            <div class="container mx-auto px-auto">
+
+                <div class="row my-3 row-cols-1 row-cols-md-2 pb-3">
+                    <div class="card col-md-12 bg-dark text-light my-3 py-2">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Add Question</h5>
+                            <p class="card-text text-center">
+                                <a href="{% url 'questions:subject-create' %}">
+                                    <i class="fas fa-plus fa-5x mt-4"></i>
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion" id="accordionPanelsStayOpen">
+
+                    {% for question in questions %}
+
+                        <div class="accordion-item bg-dark text-light">
+                            <h2 class="accordion-header" id="heading{{ question.id }}">
+                                <button class="accordion-button bg-dark text-light" type="button" data-mdb-toggle="collapse"
+                                        data-mdb-target="#panelsStayOpen-collapse{{ subject.id }}">
+                                    {{ question.question|safe}}
+                                </button>
+                                <button class="btn btn-success">
+                                    Edit Question
+                                </button>
+                            </h2>
+                            <div id="panelsStayOpen-collapse{{ subject.id }}" class="accordion-collapse collapse">
+                                <div class="accordion-body">
+
+                                    {% for answer in question.answers.all %}
+                                        {{ answer|safe }}
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+
+
+                    <form method="post">
+                        {{ form.media }}
+                        {{ form.as_p }}
+                    </form>
+                </div>
+            </div>
+        </section>
 
     {% for question in questions %}
         {{ question.question|safe }}
