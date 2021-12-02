@@ -15,20 +15,28 @@
     <meta http-equiv="X-Ua-Compatible" content="IE=edge">
 
     <!--MDB-->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.9.0/mdb.min.css" integrity="sha512-MAFufI57w9mLGud8BKZDbAT57+wu4QWMJJ9Bj5UXFaW99rswsKCvXKRxWlHwdo0yT1Of6TvvWfMqE16ktRcxfA==" crossorigin="anonymous" referrerpolicy="no-referrer"
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.9.0/mdb.min.css"
+          integrity="sha512-MAFufI57w9mLGud8BKZDbAT57+wu4QWMJJ9Bj5UXFaW99rswsKCvXKRxWlHwdo0yT1Of6TvvWfMqE16ktRcxfA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"
     />
 
     <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet"/>
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
 
     <!--Favicon-->
-    <link rel="shortcut icon" type="image/png" href="{% static 'account/images/favicon-32x32.png' %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static 'account/images/favicon-32x32.png' %}"/>
+
+    <!-- Highlight.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
 
     <!--Stylesheets-->
-    <link rel="stylesheet" type="text/css" href="{% static 'account/css/main.css' %}"> {% block additional_stylesheets %}{% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'account/css/main.css' %}">
+    {% block additional_stylesheets %}{% endblock %}
 
     <title>{% block title %}Test Generator{% endblock %}</title>
 
@@ -48,100 +56,109 @@
 
 <body onload="addClassesToTables()">
 
-    <header class="sticky-top">
+<header class="sticky-top">
 
-        <nav class="navbar navbar-dark bg-dark navbar-expand-md">
+    <nav class="navbar navbar-dark bg-dark navbar-expand-md">
 
-            <div class="container-fluid">
+        <div class="container-fluid">
 
-                <a class="navbar-brand ms-1" href="{% if user.is_authenticated %}{% url 'account:dashboard' %}{% else %}{% url 'account:main' %}{% endif %}">
-                    <img class="d-inline-block mx-3 align-center" src="{% static 'account/images/favicon-64x64.png' %}" alt="Logo" width="64" height="64">
-                    <span class="text-light ms-0">Test Generator</span>
-                </a>
+            <a class="navbar-brand ms-1" href="
+                    {% if user.is_authenticated %}{% url 'account:dashboard' %}{% else %}{% url 'account:main' %}{% endif %}">
+                <img class="d-inline-block mx-3 align-center" src="{% static 'account/images/favicon-64x64.png' %}"
+                     alt="Logo" width="64" height="64">
+                <span class="text-light ms-0">Test Generator</span>
+            </a>
 
-                <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#main-menu">
-                    <span class="navbar-toggler-icon"><i class="fas fa-bars"></i></span>
-                </button>
+            <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#main-menu">
+                <span class="navbar-toggler-icon"><i class="fas fa-bars"></i></span>
+            </button>
 
-                <div class="collapse navbar-collapse me-2" id="main-menu">
+            <div class="collapse navbar-collapse me-2" id="main-menu">
 
-                    {% if not user.is_authenticated %}
+                {% if not user.is_authenticated %}
                     <div class="navbar-nav me-auto">
                         <!--Dummy div to make a div below stick to the right side of navbar-->
                     </div>
                     <div class="navbar-nav">
-                        <a class="nav-link {% if section == 'login' %}active{% endif %}" href="{% url 'account:login' %}">
-                                Login
-                            </a>
-                        <a class="nav-link {% if section == 'register' %}active{% endif %}" href="{% url 'account:register' %}">
-                                Sign Up
-                            </a>
+                        <a class="nav-link {% if section == 'login' %}active{% endif %}"
+                           href="{% url 'account:login' %}">
+                            Login
+                        </a>
+                        <a class="nav-link {% if section == 'register' %}active{% endif %}"
+                           href="{% url 'account:register' %}">
+                            Sign Up
+                        </a>
                     </div>
-                    {% else %}
-                    <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse" data-bs-target="#main-menu">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
+                {% else %}
+                    <button class="navbar-toggler me-2" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#main-menu">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
 
                     <div class="collapse navbar-collapse" id="main-menu">
 
-                        <div class="navbar-nav me-auto">
+                    <div class="navbar-nav me-auto">
 
-                            <div class="nav-item">
-                                <a href="{% url 'account:dashboard' %}" class="nav-link {% if section == 'dashboard' %}active{% endif %}">
-                                        Dashboard
-                                    </a>
-                            </div>
+                        <div class="nav-item">
+                            <a href="{% url 'account:dashboard' %}"
+                               class="nav-link {% if section == 'dashboard' %}active{% endif %}">
+                                Dashboard
+                            </a>
+                        </div>
 
-                            <div class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" role="button" id="sub-menu" data-mdb-toggle="dropdown">
-                                        Subjects
-                                    </a>
-                                <ul class="dropdown-menu">
-                                    {% for subject in subjects %}
-                                    <li><a href="{{ subject.get_absolute_url}}" class="dropdown-item">{{subject.name}}</a></li>
-                                    {% endfor %}
-                                </ul>
-
-                            </div>
-
-                            <div class="nav-item">
-                                <a href="#" class="nav-link">People</a>
-                            </div>
-
-                            <div class="nav-item">
-                                <a href="#" class="nav-link">Help</a>
-                            </div>
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" role="button" id="sub-menu" data-mdb-toggle="dropdown">
+                                Subjects
+                            </a>
+                            <ul class="dropdown-menu">
+                                {% for subject in subjects %}
+                                    <li><a href="{{ subject.get_absolute_url }}"
+                                           class="dropdown-item">{{ subject.name }}</a></li>
+                                {% endfor %}
+                            </ul>
 
                         </div>
 
-                        {# NAVBAR RIGHT SIDE ------------------------------------------------------------------------------------------------ #}
-                        <div class="navbar-nav">
-                            <div class="nav-item">
-                                <a href="#" class="nav-link me-2 {% if section == 'profile' %}active{% endif %}">
-                                        Profile
-                                    </a>
-                            </div>
-                            <div class="nav-item">
-                                <a href="{% url 'account:logout' %}" class="nav-link me-2">
-                                        Log Out
-                                    </a>
-                            </div>
+                        <div class="nav-item">
+                            <a href="#" class="nav-link">People</a>
                         </div>
-                        <div>
-                            {% endif %}
 
+                        <div class="nav-item">
+                            <a href="#" class="nav-link">Help</a>
                         </div>
 
                     </div>
 
-        </nav>
-    </header>
+                    {# NAVBAR RIGHT SIDE ------------------------------------------------------------------------------------------------ #}
+                    <div class="navbar-nav">
+                        <div class="nav-item">
+                            <a href="#" class="nav-link me-2 {% if section == 'profile' %}active{% endif %}">
+                                Profile
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="{% url 'account:logout' %}" class="nav-link me-2">
+                                Log Out
+                            </a>
+                        </div>
+                    </div>
+                    <div>
+                {% endif %}
 
-    <main>
-        {% block content %} Hello {% endblock %}
-    </main>
+                </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.9.0/mdb.min.js" integrity="sha512-NomYb5rMKF3A008ob4pKQ2U8/1j5U7tP1ScVtEKriqH9JmO4UiGYiDocerfvTxSFq7/2b+SSnSvGNBVhhwXNEw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+                </div>
+
+    </nav>
+</header>
+
+<main>
+    {% block content %} Hello {% endblock %}
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.9.0/mdb.min.js"
+        integrity="sha512-NomYb5rMKF3A008ob4pKQ2U8/1j5U7tP1ScVtEKriqH9JmO4UiGYiDocerfvTxSFq7/2b+SSnSvGNBVhhwXNEw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 </body>
 

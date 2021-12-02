@@ -7,7 +7,7 @@
 {% block content %}
     <section class="min-vh-100 gradient-custom container-fluid">
         <h1 class="text-light text-center pt-4">
-            Subject Name
+            {{ subject.name }}
         </h1>
 
         <div class="container mx-auto px-auto">
@@ -29,9 +29,9 @@
 
                 {% for question in questions %}
 
-                    <div class="accordion-item bg-dark text-light">
+                    <div class="accordion-item">
                         <h2 class="accordion-header" id="heading{{ question.id }}">
-                            <button class="accordion-button bg-dark text-light d-block" type="button" data-mdb-toggle="collapse"
+                            <button class="accordion-button d-block" type="button" data-mdb-toggle="collapse"
                                     data-mdb-target="#panelsStayOpen-collapse{{ subject.id }}">
                                 {{ question.question|safe }}
                             </button>

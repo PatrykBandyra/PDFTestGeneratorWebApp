@@ -27,7 +27,7 @@ def create_subject(request):
 def edit_subject(request, subject_id, subject_slug):
     # Check if user is an author of a subject - only author can edit a subject (name, description)
     if not is_author_of_subject(request.user, subject_id):
-        return redirect('account:dashboard')
+        return redirect('account:dashboard')  # Just redirect - do not inform about illegal action
 
     if request.method == 'POST':
         subject_form = SubjectCreationForm(data=request.POST)
@@ -49,8 +49,10 @@ def subject(request, subject_id, subject_slug):
     if not is_owner_of_subject(request.user, subject_id):
         return redirect('account:dashboard')
 
-    questions = get_object_or_404(Subject, id=subject_id).questions.all()
-    return render(request, 'questions/subject_questions.html', {'questions': questions, 'form': TestForm()})
+    subject = get_object_or_404(Subject, id=subject_id)
+    questions = subject.questions.all()
+    return render(request, 'questions/subject_questions.html', {'subject': subject, 'questions': questions,
+                                                                'form': TestForm()})
 
 
 @login_required
