@@ -31,6 +31,6 @@ python .\generator\manage.py migrate
 W celu uruchomienia aplikacji należy:
 - przejść do katalogu domowego projektu i uruchomić polecenie:
 ```batch
-python .\generator\menage.py runserver
+python .\generator\manage.py runserver
 ```
 - uruchomić przeglądarkę internetową i przejść pod adres http://localhost:8000/
