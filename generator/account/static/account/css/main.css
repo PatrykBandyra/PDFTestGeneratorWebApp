@@ -9,3 +9,7 @@
   background: linear-gradient(to right, rgba(106, 17, 203, 1), rgb(32, 156, 238));
 
 }
+
+.django-ckeditor-widget {
+  width: 100%;
+}

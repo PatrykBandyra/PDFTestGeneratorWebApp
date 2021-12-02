@@ -17,7 +17,7 @@
                     <div class="card-body">
                         <h5 class="card-title text-center">Add Question</h5>
                         <p class="card-text text-center">
-                            <a href="#">
+                            <a href="{% url 'questions:question-create' subject.id subject.slug %}">
                                 <i class="fas fa-plus fa-5x mt-4"></i>
                             </a>
                         </p>
@@ -30,13 +30,21 @@
                 {% for question in questions %}
 
                     <div class="accordion-item">
+                        <nav class="navbar navbar-light bg-light">
+                            <div class="container-fluid">
+                                <button class="btn btn-success">
+                                    Edit
+                                </button>
+                                <button class="btn btn-danger">
+                                    Delete
+                                </button>
+                            </div>
+                        </nav>
+
                         <h2 class="accordion-header" id="heading{{ question.id }}">
                             <button class="accordion-button d-block" type="button" data-mdb-toggle="collapse"
                                     data-mdb-target="#panelsStayOpen-collapse{{ subject.id }}">
                                 {{ question.question|safe }}
-                            </button>
-                            <button class="btn btn-success">
-                                Edit Question
                             </button>
                         </h2>
                         <div id="panelsStayOpen-collapse{{ subject.id }}" class="accordion-collapse collapse">

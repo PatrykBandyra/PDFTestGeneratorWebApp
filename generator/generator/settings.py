@@ -232,6 +232,7 @@ CKEDITOR_CONFIGS = {
             ['CodeSnippet', 'Mathjax'],
             ['Undo', 'Redo']
         ],
+        'width': '100%',
         'mathJaxLib': '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML',
         'extraPlugins': ['codesnippet', 'mathjax'],
     }

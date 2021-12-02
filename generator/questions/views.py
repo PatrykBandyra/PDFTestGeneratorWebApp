@@ -57,4 +57,15 @@ def subject(request, subject_id, subject_slug):
 
 @login_required
 def create_question(request, subject_id, subject_slug):
-    return render(request, 'questions/question_form.html', {'form': QuestionCreationForm()})
+    if request.method == 'POST':
+        question_form = QuestionCreationForm(data=request.POST)
+        if question_form.is_valid():
+            new_question = question_form.save(commit=False)
+            subject = get_object_or_404(Subject, id=subject_id)
+            new_question.subject = subject
+            new_question.author = request.user
+            new_question.save()
+            return redirect(subject.get_absolute_url())
+    else:
+        question_form = QuestionCreationForm()
+    return render(request, 'questions/question_create.html', {'question_form': question_form})

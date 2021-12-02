@@ -36,7 +36,7 @@ class Question(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='questions')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='questions')
     created = models.DateTimeField(auto_now_add=True)
-    last_use = models.DateTimeField()
+    last_use = models.DateTimeField(blank=True, null=True)  # Last use in a test
     # tags
 
     class Meta:
