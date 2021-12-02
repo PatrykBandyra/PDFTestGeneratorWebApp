@@ -23,7 +23,7 @@ Należy:
 - uruchomić bazę danych
 - przejść do katalogu domowego projektu i uruchomić polecenie:
 ```batch
-python .\generator\menage.py migrate
+python .\generator\manage.py migrate
 ```
 
 ### Uruchomienie:
