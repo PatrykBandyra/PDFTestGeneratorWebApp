@@ -224,13 +224,15 @@ CKEDITOR_CONFIGS = {
         'skin': 'moono-lisa',
         'toolbar': 'Custom',
         'toolbar_Custom': [
-            ['Styles', 'Format', 'Bold', 'Italic', 'Underline', 'Strike'],
+            ['Styles', 'Format', 'Font', 'FontSize'],
+            ['Bold', 'Italic', 'Underline', 'Strike'],
             ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Indent', 'Outdent'],
             ['TextColor', 'BGColor'],
             ['NumberedList', 'BulletedList', 'Table'],
-            ['CodeSnippet'],
+            ['CodeSnippet', 'Mathjax'],
             ['Undo', 'Redo']
         ],
-        'extraPlugins': 'codesnippet'
+        'mathJaxLib': '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML',
+        'extraPlugins': ['codesnippet', 'mathjax'],
     }
 }
