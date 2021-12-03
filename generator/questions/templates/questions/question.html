@@ -16,7 +16,7 @@
 
                         <nav class="navbar navbar-light bg-light mb-4">
                             <div class="container-fluid">
-                                <a class="btn btn-success" href="#">
+                                <a class="btn btn-success" href="{% url 'questions:question-edit' question.subject.id question.subject.slug question.id %}">
                                     Edit
                                 </a>
                                 <button type="button" data-mdb-toggle="modal"

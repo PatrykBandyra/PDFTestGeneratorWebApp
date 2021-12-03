@@ -4,6 +4,8 @@ from . import views
 app_name = 'questions'
 urlpatterns = [
     path('subject/<int:subject_id>/<slug:subject_slug>/<int:question_id>/', views.question, name='question'),
+    path('subject/<int:subject_id>/<slug:subject_slug>/<int:question_id>/edit/',
+         views.edit_question, name='question-edit'),
     path('subject/<int:subject_id>/<slug:subject_slug>/add-question/', views.create_question, name='question-create'),
     path('subject/<int:subject_id>/<slug:subject_slug>/edit', views.edit_subject, name='subject-edit'),
     path('subject/<int:subject_id>/<slug:subject_slug>/', views.subject, name='subject'),

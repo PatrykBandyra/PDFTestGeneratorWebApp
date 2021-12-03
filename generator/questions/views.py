@@ -93,20 +93,45 @@ def create_question(request, subject_id, subject_slug):
 @login_required
 @require_http_methods(['GET', 'POST'])
 def question(request, subject_id, subject_slug, question_id):
-    # Question deletion
-    if request.method == 'POST':
-        try:
-            # Check if user is an author of a subject or an author of a question
-            question_id = int(request.POST.get('delete'))
-            if not is_author_of_question(request.user, question_id) and \
-                    not is_owner_of_subject(request.user, subject_id):
-                raise Exception
 
-            Question.objects.filter(id=question_id).delete()
-        except Exception:
-            pass
+    # Check if a user is an author of subject or an author of a question
+    if is_author_of_subject(request.user, subject_id) or is_author_of_question(request.user, question_id):
+        # Question deletion
+        if request.method == 'POST':
+            try:
+                question_id = int(request.POST.get('delete'))
+                Question.objects.filter(id=question_id).delete()
+            except Exception:
+                pass
+            return redirect(Subject.objects.get(id=subject_id).get_absolute_url())
+
+        else:  #GET
+            question = get_object_or_404(Question, id=question_id)
+            return render(request, 'questions/question.html', {'question': question, 'answers': question.answers.all()})
+
+    else:
         return redirect(Subject.objects.get(id=subject_id).get_absolute_url())
 
-    else:  # GET
-        question = get_object_or_404(Question, id=question_id)
-        return render(request, 'questions/question.html', {'question': question, 'answers': question.answers.all()})
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def edit_question(request, subject_id, subject_slug, question_id):
+
+    # Check if a user can edit a question
+    if is_author_of_subject(request.user, subject_id) or is_author_of_question(request.user, question_id):
+        if request.method == 'POST':
+            question_form = QuestionCreationForm(data=request.POST)
+            if question_form.is_valid():
+                question_edited = get_object_or_404(Question, id=question_id)
+                question_edited.question = question_form.cleaned_data.get('question')
+                question_edited.save()
+
+            return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
+
+        else:
+            question_edited = get_object_or_404(Question, id=question_id)
+            question_form = QuestionCreationForm(initial={'question': question_edited.question})
+            return render(request, 'questions/question_edit.html', {'question_form': question_form})
+
+    else:
+        return redirect(get_object_or_404(Subject, id=subject_id).get_absolute_url())
