@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-    <section class="min-vh-100 gradient-custom container-fluid">
+    <section class="min-vh-100 gradient-custom container-fluid pb-5">
         <h1 class="text-light text-center pt-4">
             {{ subject.name }}
         </h1>
@@ -29,83 +29,67 @@
 
                 {% for question in questions %}
 
-                    <div class="accordion-item">
-                        <nav class="navbar navbar-light bg-light">
+                    <div class="accordion-item rounded mt-3">
+                        <nav class="navbar navbar-light bg-transparent">
                             <div class="container-fluid">
-                                <button class="btn btn-success">
+                                <a class="btn btn-success"
+                                   href="{% url 'questions:question' subject.id subject.slug question.id %}">
                                     Edit
-                                </button>
-                                <button class="btn btn-danger">
+                                </a>
+                                <button type="button" data-mdb-toggle="modal"
+                                        data-mdb-target="#delete{{ question.id }}"
+                                        class="btn btn-danger">
                                     Delete
                                 </button>
                             </div>
                         </nav>
 
                         <h2 class="accordion-header" id="heading{{ question.id }}">
-                            <button class="accordion-button d-block" type="button" data-mdb-toggle="collapse"
-                                    data-mdb-target="#panelsStayOpen-collapse{{ subject.id }}">
+                            <button class="accordion-button d-block collapsed" type="button" data-mdb-toggle="collapse"
+                                    data-mdb-target="#panelsStayOpen-collapse{{ question.id }}">
                                 {{ question.question|safe }}
                             </button>
                         </h2>
-                        <div id="panelsStayOpen-collapse{{ subject.id }}" class="accordion-collapse collapse">
+                        <div id="panelsStayOpen-collapse{{ question.id }}" class="accordion-collapse collapse">
                             <div class="accordion-body">
 
                                 {% for answer in question.answers.all %}
-                                    {{ answer|safe }}
+                                    {{ answer.answer|safe }}
                                 {% endfor %}
 
                             </div>
                         </div>
                     </div>
 
+                    {# Delete dialog #}
+                    <div class="modal" tabindex="-1" role="dialog" id="delete{{ question.id }}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Delete Question</h5>
+                                    <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete the question?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="delete" value="{{ question.id }}">
+                                        <button type="submit" class="btn btn-danger">Yes, delete</button>
+                                    </form>
+                                    <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
+                                        No, cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 {% endfor %}
 
-
-                <form method="post">
-                    {{ form.media }}
-                    {{ form.as_p }}
-                </form>
             </div>
         </div>
     </section>
-
-    {% for question in questions %}
-        {{ question.question|safe }}
-    {% endfor %}
-
-
-    <div class="accordion" id="accordionExample">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="headingOne">
-                <button
-                        class="accordion-button"
-                        type="button"
-                        data-mdb-toggle="collapse"
-                        data-mdb-target="#collapseOne"
-                        aria-expanded="true"
-                        aria-controls="collapseOne"
-                >
-                    Accordion Item #1
-                </button>
-            </h2>
-            <div
-                    id="collapseOne"
-                    class="accordion-collapse collapse show"
-                    aria-labelledby="headingOne"
-                    data-mdb-parent="#accordionExample"
-            >
-                <div class="accordion-body">
-                    <strong>This is the first item's accordion body.</strong> It is hidden by default,
-                    until the collapse plugin adds the appropriate classes that we use to style each
-                    element. These classes control the overall appearance, as well as the showing and
-                    hiding via CSS transitions. You can modify any of this with custom CSS or
-                    overriding our default variables. It's also worth noting that just about any HTML
-                    can go within the <strong>.accordion-body</strong>, though the transition does
-                    limit overflow.
-                </div>
-            </div>
-        </div>
-    </div>
-
 
 {% endblock %}

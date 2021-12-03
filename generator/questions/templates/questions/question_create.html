@@ -22,10 +22,20 @@
                                     Please fill in the form to add a new question.
                                 </p>
 
+                                <h1 class="h1">
+                                    Question
+                                </h1>
+
+                                <p class="text-danger">
+                                    {% for error in question_form.question.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </p>
+
                                 <form method="post">
 
                                     {{ question_form.media }}
-                                    {{ question_form.as_p }}
+                                    {{ question_form.question }}
 
                                     {% csrf_token %}
                                     <button class="btn btn-outline-light btn-lg px-5 mt-3" type="submit">

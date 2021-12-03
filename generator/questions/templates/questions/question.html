@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Question Details
+{% endblock %}
+
+{% block content %}
+    <section class="min-vh-100 gradient-custom container-fluid">
+        <div class="container py-5 h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+
+                <h3 class="h3 text-light text-center">Question</h3>
+
+                <div class="container">
+                    <div class="col-12 bg-white rounded py-1 my-2">
+
+                        <nav class="navbar navbar-light bg-light mb-4">
+                            <div class="container-fluid">
+                                <a class="btn btn-success" href="#">
+                                    Edit
+                                </a>
+                                <button type="button" data-mdb-toggle="modal"
+                                        data-mdb-target="#delete{{ question.id }}"
+                                        class="btn btn-danger my-2 mx-3">
+                                    Delete
+                                </button>
+                            </div>
+                        </nav>
+
+                        <div class="mx-3">
+                            {{ question.question|safe }}
+                        </div>
+
+                    </div>
+                    {# Delete dialog #}
+                    <div class="modal" tabindex="-1" role="dialog" id="delete{{ question.id }}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Delete Question</h5>
+                                    <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to delete the question?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="delete" value="{{ question.id }}">
+                                        <button type="submit" class="btn btn-danger">Yes, delete</button>
+                                    </form>
+                                    <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
+                                        No, cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <h3 class="h3 text-light text-center">Answers</h3>
+
+                {% for answer in answers %}
+                    <div class="col-12 bg-white rounded py-1 my-2">
+                        {{ answer.answer|safe }}
+                    </div>
+                {% endfor %}
+
+
+                <div class="card col-md-12 bg-dark text-light my-3 py-2">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Add Answer</h5>
+                        <p class="card-text text-center">
+                            <a href="#">
+                                <i class="fas fa-plus fa-5x mt-4"></i>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+{% endblock %}

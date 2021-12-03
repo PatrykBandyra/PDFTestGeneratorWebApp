@@ -16,10 +16,6 @@ class SubjectCreationForm(forms.ModelForm):
         fields = ('name', 'description')
 
 
-class TestForm(forms.Form):
-    text = RichTextFormField()
-
-
 class QuestionCreationForm(forms.ModelForm):
     class Meta:
         model = Question

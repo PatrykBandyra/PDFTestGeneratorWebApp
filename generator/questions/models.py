@@ -45,6 +45,9 @@ class Question(models.Model):
     def __str__(self):
         return f'ID: {self.id}, AUTHOR: {self.author.username}'
 
+    def get_absolute_url(self):
+        return reverse('questions:question', args=[self.subject.id, self.subject.slug, self.id])
+
 
 class Answer(models.Model):
     answer = RichTextField(max_length=1000)
