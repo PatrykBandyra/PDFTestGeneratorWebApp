@@ -69,6 +69,7 @@
 
             <a class="navbar-brand ms-1" href="
 
+
                     {% if user.is_authenticated %}{% url 'account:dashboard' %}{% else %}{% url 'account:main' %}{% endif %}">
                 <img class="d-inline-block mx-3 align-center" src="{% static 'account/images/favicon-64x64.png' %}"
                      alt="Logo" width="64" height="64">
