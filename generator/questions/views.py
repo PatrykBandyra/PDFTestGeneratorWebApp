@@ -121,8 +121,6 @@ def question(request, subject_id, subject_slug, question_id):
                 question = get_object_or_404(Question, id=question_id)
                 answer_to_go_down = question.answers.filter(question=question, order__lt=answer_to_go_up.order)\
                     .order_by('-order').first()
-                print(f'TO GO UP: {answer_to_go_up}')
-                print(f'TO GO DOWN: {answer_to_go_down}')
                 with transaction.atomic():
                     temp_order = answer_to_go_up.order
                     answer_to_go_up.order = answer_to_go_down.order
@@ -136,8 +134,6 @@ def question(request, subject_id, subject_slug, question_id):
                 question = get_object_or_404(Question, id=question_id)
                 answer_to_go_up = question.answers.filter(question=question, order__gt=answer_to_go_down.order)\
                     .order_by('order').first()
-                print(f'TO GO UP: {answer_to_go_up}')
-                print(f'TO GO DOWN: {answer_to_go_down}')
                 with transaction.atomic():
                     temp_order = answer_to_go_down.order
                     answer_to_go_down.order = answer_to_go_up.order
