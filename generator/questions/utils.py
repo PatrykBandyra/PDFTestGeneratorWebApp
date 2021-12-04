@@ -1,3 +1,6 @@
+from .models import Question, Answer
+
+
 def is_author_of_subject(user, subject_id):
     """
     Checks if a user is an author of a subject with given id.
@@ -21,3 +24,11 @@ def is_author_of_question(user, question_id):
     Being an author of a question allows user to delete and modify it.
     """
     return True if question_id in user.questions.all().values_list('id', flat=True) else False
+
+
+def is_answer_unique_constraint_fulfilled(question, order):
+    """
+    Checks if an answer does not validate a unique constraint (Question, order).
+    For usage in views to validate user input.
+    """
+    return True if not Answer.objects.filter(question=question, order=int(order)) else False

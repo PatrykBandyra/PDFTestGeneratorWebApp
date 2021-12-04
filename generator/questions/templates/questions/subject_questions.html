@@ -52,9 +52,20 @@
                         </h2>
                         <div id="panelsStayOpen-collapse{{ question.id }}" class="accordion-collapse collapse">
                             <div class="accordion-body">
+                                <div class="d-flex justify-content-center border-bottom border-dark mb-2">
+                                    <h3 class="h3">Answers</h3>
+                                </div>
 
                                 {% for answer in question.answers.all %}
-                                    {{ answer.answer|safe }}
+                                    {% if answer.is_right %}
+                                        <div class="p-2 my-2" style="border: 3px green solid; border-radius: 15px">
+                                            {{ answer.answer|safe }}
+                                        </div>
+                                    {% else %}
+                                        <div class="p-2 my-2" style="border: 3px red solid; border-radius: 15px">
+                                            {{ answer.answer|safe }}
+                                        </div>
+                                    {% endif %}
                                 {% endfor %}
 
                             </div>

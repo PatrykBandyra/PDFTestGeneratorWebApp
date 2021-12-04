@@ -16,7 +16,8 @@
 
                         <nav class="navbar navbar-light bg-light mb-4">
                             <div class="container-fluid">
-                                <a class="btn btn-success" href="{% url 'questions:question-edit' question.subject.id question.subject.slug question.id %}">
+                                <a class="btn btn-success"
+                                   href="{% url 'questions:question-edit' question.subject.id question.subject.slug question.id %}">
                                     Edit
                                 </a>
                                 <button type="button" data-mdb-toggle="modal"
@@ -46,7 +47,7 @@
                                 <div class="modal-footer">
                                     <form method="post">
                                         {% csrf_token %}
-                                        <input type="hidden" name="delete" value="{{ question.id }}">
+                                        <input type="hidden" name="delete-question" value="{{ question.id }}">
                                         <button type="submit" class="btn btn-danger">Yes, delete</button>
                                     </form>
                                     <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
@@ -62,9 +63,62 @@
                 <h3 class="h3 text-light text-center">Answers</h3>
 
                 {% for answer in answers %}
-                    <div class="col-12 bg-white rounded py-1 my-2">
-                        {{ answer.answer|safe }}
+
+                    <div class="container">
+                        <div class="col-12 bg-white rounded py-1 my-2"
+                                {% if answer.is_right %}
+                             style="border: 10px green solid; border-radius: 25px"
+                                {% else %}
+                             style="border: 10px red solid; border-radius: 25px"
+                                {% endif %}
+                        >
+
+                            <nav class="navbar navbar-light bg-light mb-4">
+                                <div class="container-fluid">
+                                    <a class="btn btn-success"
+                                       href="{% url 'questions:question-edit-answer' question.subject.id question.subject.slug question.id answer.id %}">
+                                        Edit
+                                    </a>
+                                    <button type="button" data-mdb-toggle="modal"
+                                            data-mdb-target="#delete{{ answer.id }}"
+                                            class="btn btn-danger my-2 mx-3">
+                                        Delete
+                                    </button>
+                                </div>
+                            </nav>
+
+                            <div class="col-12 bg-white rounded p-2 my-2">
+                                {{ answer.answer|safe }}
+                            </div>
+
+                        </div>
+                        {# Delete dialog #}
+                        <div class="modal" tabindex="-1" role="dialog" id="delete{{ answer.id }}">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Delete Question</h5>
+                                        <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to delete the answer?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="delete-answer" value="{{ answer.id }}">
+                                            <button type="submit" class="btn btn-danger">Yes, delete</button>
+                                        </form>
+                                        <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
+                                            No, cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+
                 {% endfor %}
 
 
@@ -72,7 +126,7 @@
                     <div class="card-body">
                         <h5 class="card-title text-center">Add Answer</h5>
                         <p class="card-text text-center">
-                            <a href="#">
+                            <a href="{% url 'questions:question-add-answer' question.subject.id question.subject.slug question.id %}">
                                 <i class="fas fa-plus fa-5x mt-4"></i>
                             </a>
                         </p>
