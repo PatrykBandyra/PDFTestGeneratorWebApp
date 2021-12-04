@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.utils import IntegrityError
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.http import require_GET, require_http_methods
 from django.db import transaction
@@ -81,8 +82,12 @@ def subject(request, subject_id, subject_slug):
         # If page value is not int - get first page
         questions_page = paginator.page(1)
     except EmptyPage:
+        if request.is_ajax():
+            return HttpResponse('')
         # If page value is bigger than the value of last page - get last page
         questions_page = paginator.page(paginator.num_pages)
+    if request.is_ajax():
+        return render(request, 'questions/subject_questions_ajax.html', {'subject': subject, 'questions': questions})
 
     return render(request, 'questions/subject_questions.html', {'subject': subject, 'questions': questions_page})
 

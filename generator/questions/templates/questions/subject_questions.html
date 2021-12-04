@@ -27,77 +27,81 @@
 
             <div class="accordion" id="accordionPanelsStayOpen">
 
-                {% for question in questions %}
+                {#                {% for question in questions %}#}
+                {##}
+                {#                    <div class="accordion-item rounded mt-3">#}
+                {#                        <nav class="navbar navbar-light bg-transparent">#}
+                {#                            <div class="container-fluid">#}
+                {#                                <a class="btn btn-success"#}
+                {#                                   href="{% url 'questions:question' subject.id subject.slug question.id %}">#}
+                {#                                    Edit#}
+                {#                                </a>#}
+                {#                                <button type="button" data-mdb-toggle="modal"#}
+                {#                                        data-mdb-target="#delete{{ question.id }}"#}
+                {#                                        class="btn btn-danger">#}
+                {#                                    Delete#}
+                {#                                </button>#}
+                {#                            </div>#}
+                {#                        </nav>#}
+                {##}
+                {#                        <h2 class="accordion-header" id="heading{{ question.id }}">#}
+                {#                            <button class="accordion-button d-block collapsed" type="button" data-mdb-toggle="collapse"#}
+                {#                                    data-mdb-target="#panelsStayOpen-collapse{{ question.id }}">#}
+                {#                                {{ question.question|safe }}#}
+                {#                            </button>#}
+                {#                        </h2>#}
+                {#                        <div id="panelsStayOpen-collapse{{ question.id }}" class="accordion-collapse collapse">#}
+                {#                            <div class="accordion-body">#}
+                {#                                <div class="d-flex justify-content-center border-bottom border-dark mb-2">#}
+                {#                                    <h3 class="h3">Answers</h3>#}
+                {#                                </div>#}
+                {##}
+                {#                                {% for answer in question.answers.all %}#}
+                {#                                    {% if answer.is_right %}#}
+                {#                                        <div class="p-2 my-2" style="border: 3px green solid; border-radius: 15px">#}
+                {#                                            {{ answer.answer|safe }}#}
+                {#                                        </div>#}
+                {#                                    {% else %}#}
+                {#                                        <div class="p-2 my-2" style="border: 3px red solid; border-radius: 15px">#}
+                {#                                            {{ answer.answer|safe }}#}
+                {#                                        </div>#}
+                {#                                    {% endif %}#}
+                {#                                {% endfor %}#}
+                {##}
+                {#                            </div>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {##}
+                {# Delete dialog #}
+                {#                    <div class="modal" tabindex="-1" role="dialog" id="delete{{ question.id }}">#}
+                {#                        <div class="modal-dialog">#}
+                {#                            <div class="modal-content">#}
+                {#                                <div class="modal-header">#}
+                {#                                    <h5 class="modal-title">Delete Question</h5>#}
+                {#                                    <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>#}
+                {#                                </div>#}
+                {#                                <div class="modal-body">#}
+                {#                                    <p>Are you sure you want to delete the question?</p>#}
+                {#                                </div>#}
+                {#                                <div class="modal-footer">#}
+                {#                                    <form method="post">#}
+                {#                                        {% csrf_token %}#}
+                {#                                        <input type="hidden" name="delete" value="{{ question.id }}">#}
+                {#                                        <button type="submit" class="btn btn-danger">Yes, delete</button>#}
+                {#                                    </form>#}
+                {#                                    <button type="button" class="btn btn-success" data-mdb-dismiss="modal">#}
+                {#                                        No, cancel#}
+                {#                                    </button>#}
+                {#                                </div>#}
+                {#                            </div>#}
+                {#                        </div>#}
+                {#                    </div>#}
+                {##}
+                {#                {% endfor %}#}
 
-                    <div class="accordion-item rounded mt-3">
-                        <nav class="navbar navbar-light bg-transparent">
-                            <div class="container-fluid">
-                                <a class="btn btn-success"
-                                   href="{% url 'questions:question' subject.id subject.slug question.id %}">
-                                    Edit
-                                </a>
-                                <button type="button" data-mdb-toggle="modal"
-                                        data-mdb-target="#delete{{ question.id }}"
-                                        class="btn btn-danger">
-                                    Delete
-                                </button>
-                            </div>
-                        </nav>
-
-                        <h2 class="accordion-header" id="heading{{ question.id }}">
-                            <button class="accordion-button d-block collapsed" type="button" data-mdb-toggle="collapse"
-                                    data-mdb-target="#panelsStayOpen-collapse{{ question.id }}">
-                                {{ question.question|safe }}
-                            </button>
-                        </h2>
-                        <div id="panelsStayOpen-collapse{{ question.id }}" class="accordion-collapse collapse">
-                            <div class="accordion-body">
-                                <div class="d-flex justify-content-center border-bottom border-dark mb-2">
-                                    <h3 class="h3">Answers</h3>
-                                </div>
-
-                                {% for answer in question.answers.all %}
-                                    {% if answer.is_right %}
-                                        <div class="p-2 my-2" style="border: 3px green solid; border-radius: 15px">
-                                            {{ answer.answer|safe }}
-                                        </div>
-                                    {% else %}
-                                        <div class="p-2 my-2" style="border: 3px red solid; border-radius: 15px">
-                                            {{ answer.answer|safe }}
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-
-                            </div>
-                        </div>
-                    </div>
-
-                    {# Delete dialog #}
-                    <div class="modal" tabindex="-1" role="dialog" id="delete{{ question.id }}">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Delete Question</h5>
-                                    <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Are you sure you want to delete the question?</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <form method="post">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="delete" value="{{ question.id }}">
-                                        <button type="submit" class="btn btn-danger">Yes, delete</button>
-                                    </form>
-                                    <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
-                                        No, cancel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                {% endfor %}
+                <div id="question-list">
+                    {% include 'questions/subject_questions_ajax.html' %}
+                </div>
 
             </div>
         </div>
@@ -140,3 +144,27 @@
     </script>
 
 {% endblock %}
+
+{#{% block domready %}#}
+{#    var page = 1;#}
+{#    var empty_page = false;#}
+{#    var block_request = false;#}
+{##}
+{#    $(window).scroll(function() {#}
+{#    var margin = $(document).height() - $(window).height() - 200;#}
+{#    if  ($(window).scrollTop() > margin && empty_page == false &&#}
+{#    block_request == false) {#}
+{#    block_request = true;#}
+{#    page += 1;#}
+{#    $.get('{% url 'questions:subject' subject.id subject.slug %}?page=' + page, function(data) {#}
+{#    if(data == '') {#}
+{#    empty_page = true;#}
+{#    }#}
+{#    else {#}
+{#    block_request = false;#}
+{#    $('#question-list').append(data);#}
+{#    }#}
+{#    });#}
+{#    }#}
+{#    });#}
+{#{% endblock %}#}
