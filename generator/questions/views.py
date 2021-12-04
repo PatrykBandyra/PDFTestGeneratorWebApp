@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.utils import IntegrityError
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.http import require_GET, require_http_methods
 from django.db import transaction
 from .forms import SubjectCreationForm, QuestionCreationForm, AnswerCreationForm
@@ -72,7 +73,18 @@ def subject(request, subject_id, subject_slug):
     subject = get_object_or_404(Subject, id=subject_id)
     questions = subject.questions.all()
 
-    return render(request, 'questions/subject_questions.html', {'subject': subject, 'questions': questions})
+    paginator = Paginator(questions, 6)
+    page = request.GET.get('page')
+    try:
+        questions_page = paginator.page(page)
+    except PageNotAnInteger:
+        # If page value is not int - get first page
+        questions_page = paginator.page(1)
+    except EmptyPage:
+        # If page value is bigger than the value of last page - get last page
+        questions_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'questions/subject_questions.html', {'subject': subject, 'questions': questions_page})
 
 
 @login_required
