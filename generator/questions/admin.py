@@ -9,6 +9,7 @@ admin.site.register(Answer)
 class AnswerInline(admin.TabularInline):
     model = Answer
     extra = 1
+    ordering = ('order',)
 
 
 @admin.register(Question)

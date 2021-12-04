@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.utils import IntegrityError
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_GET, require_http_methods
+from django.db import transaction
 from .forms import SubjectCreationForm, QuestionCreationForm, AnswerCreationForm
 from .models import Subject, Question, Answer
 from .utils import (is_author_of_subject, is_owner_of_subject, is_author_of_question,
@@ -96,7 +97,7 @@ def create_question(request, subject_id, subject_slug):
 def question(request, subject_id, subject_slug, question_id):
     # Check if a user is an author of subject or an author of a question
     if is_author_of_subject(request.user, subject_id) or is_author_of_question(request.user, question_id):
-        # Question/answer deletion
+        # Question/answer deletion or answer ordinal number change
         if request.method == 'POST':
 
             if 'delete-question' in request.POST:
@@ -115,9 +116,40 @@ def question(request, subject_id, subject_slug, question_id):
                     pass
                 return redirect(Question.objects.get(id=question_id).get_absolute_url())
 
+            elif 'up' in request.POST:
+                answer_to_go_up = get_object_or_404(Answer, id=int(request.POST.get('up')))
+                question = get_object_or_404(Question, id=question_id)
+                answer_to_go_down = question.answers.filter(question=question, order__lt=answer_to_go_up.order)\
+                    .order_by('-order').first()
+                print(f'TO GO UP: {answer_to_go_up}')
+                print(f'TO GO DOWN: {answer_to_go_down}')
+                with transaction.atomic():
+                    temp_order = answer_to_go_up.order
+                    answer_to_go_up.order = answer_to_go_down.order
+                    answer_to_go_down.order = temp_order
+                    answer_to_go_up.save()
+                    answer_to_go_down.save()
+                return redirect(Question.objects.get(id=question_id).get_absolute_url())
+
+            elif 'down' in request.POST:
+                answer_to_go_down = get_object_or_404(Answer, id=int(request.POST.get('down')))
+                question = get_object_or_404(Question, id=question_id)
+                answer_to_go_up = question.answers.filter(question=question, order__gt=answer_to_go_down.order)\
+                    .order_by('order').first()
+                print(f'TO GO UP: {answer_to_go_up}')
+                print(f'TO GO DOWN: {answer_to_go_down}')
+                with transaction.atomic():
+                    temp_order = answer_to_go_down.order
+                    answer_to_go_down.order = answer_to_go_up.order
+                    answer_to_go_up.order = temp_order
+                    answer_to_go_down.save()
+                    answer_to_go_up.save()
+                return redirect(Question.objects.get(id=question_id).get_absolute_url())
+
         else:  # GET
             question = get_object_or_404(Question, id=question_id)
-            return render(request, 'questions/question.html', {'question': question, 'answers': question.answers.all()})
+            answers = question.answers.all().order_by('order')
+            return render(request, 'questions/question.html', {'question': question, 'answers': answers})
 
     else:
         return redirect(Subject.objects.get(id=subject_id).get_absolute_url())

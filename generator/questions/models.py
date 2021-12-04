@@ -60,4 +60,15 @@ class Answer(models.Model):
         return f'ID: {self.id}, QUESTION ID: {self.question.id}'
 
     class Meta:
-        unique_together = ('question', 'order')
+        # unique_together = ('question', 'order')
+        required_db_features = {
+            'supports_deferrable_unique_constraints'
+        }
+        constraints = [
+            models.UniqueConstraint(
+                fields=['question', 'order'],
+                name='question_order_unique',
+                deferrable=models.Deferrable.DEFERRED,
+            )
+        ]
+
