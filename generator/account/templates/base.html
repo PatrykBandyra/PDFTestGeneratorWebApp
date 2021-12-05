@@ -73,6 +73,7 @@
 
 
 
+
                     {% if user.is_authenticated %}{% url 'account:dashboard' %}{% else %}{% url 'account:main' %}{% endif %}">
                 <img class="d-inline-block mx-3 align-center" src="{% static 'account/images/favicon-64x64.png' %}"
                      alt="Logo" width="64" height="64">
@@ -142,7 +143,8 @@
                     {# NAVBAR RIGHT SIDE ------------------------------------------------------------------------------------------------ #}
                     <div class="navbar-nav">
                         <div class="nav-item">
-                            <a href="{% url 'account:password_change' %}" class="nav-link me-2 {% if section == 'profile' %}active{% endif %}">
+                            <a href="{% url 'account:password_change' %}"
+                               class="nav-link me-2 {% if section == 'profile' %}active{% endif %}">
                                 Profile
                             </a>
                         </div>
@@ -163,7 +165,11 @@
 </header>
 
 <main>
-    {% block content %} Hello {% endblock %}
+    {% block content %}
+        <div class="text-center mt-5">
+            Here we will have a really nice banner describing our application
+        </div>
+    {% endblock %}
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.9.0/mdb.min.js"
