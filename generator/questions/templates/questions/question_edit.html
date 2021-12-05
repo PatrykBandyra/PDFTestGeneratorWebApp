@@ -38,6 +38,18 @@
                                     {{ question_form.media }}
                                     {{ question_form.question }}
 
+                                    <div>
+                                        <p class="text-danger">
+                                            {% for error in question_form.tags.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </p>
+                                        <div>
+                                            {{ question_form.tags.label }} - comma separated words
+                                        </div>
+                                        {{ question_form.tags }}
+                                    </div>
+
                                     {% csrf_token %}
                                     <div>
                                         <button class="btn btn-outline-light btn-lg px-5 mt-3" type="submit">

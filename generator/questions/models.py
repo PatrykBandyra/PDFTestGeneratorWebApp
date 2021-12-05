@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
 from ckeditor.fields import RichTextField
+from taggit.managers import TaggableManager
 
 
 class Subject(models.Model):
@@ -38,7 +39,7 @@ class Question(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)  # Last edition
     last_use = models.DateTimeField(blank=True, null=True)  # Last use in a test
-    # tags
+    tags = TaggableManager()
 
     class Meta:
         ordering = ('-created',)

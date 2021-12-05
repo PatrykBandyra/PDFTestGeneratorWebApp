@@ -3,9 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.db.utils import IntegrityError
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
+from django.views.generic.edit import UpdateView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.decorators.http import require_GET, require_http_methods
 from django.db import transaction
+from django.contrib.auth.mixins import LoginRequiredMixin
+from taggit.models import Tag
+import re
 from .forms import SubjectCreationForm, QuestionCreationForm, AnswerCreationForm
 from .models import Subject, Question, Answer
 from .utils import (is_author_of_subject, is_owner_of_subject, is_author_of_question,
@@ -52,7 +56,7 @@ def edit_subject(request, subject_id, subject_slug):
 
 @login_required
 @require_http_methods(['GET', 'POST'])
-def subject(request, subject_id, subject_slug):
+def subject(request, subject_id, subject_slug, tag_slug=None):
     # Question deletion
     if request.method == 'POST':
         try:
@@ -74,6 +78,11 @@ def subject(request, subject_id, subject_slug):
     subject = get_object_or_404(Subject, id=subject_id)
     questions = subject.questions.all()
 
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        questions = questions.filter(tags__in=[tag])
+
     paginator = Paginator(questions, 6)
     page = request.GET.get('page')
     try:
@@ -87,9 +96,11 @@ def subject(request, subject_id, subject_slug):
         # If page value is bigger than the value of last page - get last page
         questions_page = paginator.page(paginator.num_pages)
     if request.is_ajax():
-        return render(request, 'questions/subject_questions_ajax.html', {'subject': subject, 'questions': questions})
+        return render(request, 'questions/subject_questions_ajax.html', {'subject': subject, 'questions': questions,
+                                                                         'tag': tag})
 
-    return render(request, 'questions/subject_questions.html', {'subject': subject, 'questions': questions_page})
+    return render(request, 'questions/subject_questions.html', {'subject': subject, 'questions': questions_page,
+                                                                'tag': tag})
 
 
 @login_required
@@ -103,6 +114,7 @@ def create_question(request, subject_id, subject_slug):
             new_question.subject = subject
             new_question.author = request.user
             new_question.save()
+            question_form.save_m2m()
             return redirect(new_question.get_absolute_url())
     else:
         question_form = QuestionCreationForm()
@@ -176,19 +188,47 @@ def edit_question(request, subject_id, subject_slug, question_id):
         if request.method == 'POST':
             question_form = QuestionCreationForm(data=request.POST)
             if question_form.is_valid():
+                # new_question_edited = question_form.save(commit=False)
                 question_edited = get_object_or_404(Question, id=question_id)
                 question_edited.question = question_form.cleaned_data.get('question')
+
+                # Remove tags
+                for tag in question_edited.tags.all():
+                    if tag.name not in re.split(', |,| ', question_form.data.get('tags')):
+                        question_edited.tags.remove(tag)
+
+                # Add tags
+                for tag in re.split(', |,| ', question_form.data.get('tags')):
+                    question_edited.tags.add(tag.strip())
                 question_edited.save()
 
             return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
 
         else:
             question_edited = get_object_or_404(Question, id=question_id)
-            question_form = QuestionCreationForm(initial={'question': question_edited.question})
+            question_form = QuestionCreationForm(initial={'question': question_edited.question,
+                                                          'tags': question_edited.tags.all()})
             return render(request, 'questions/question_edit.html', {'question_form': question_form})
 
     else:
         return redirect(get_object_or_404(Subject, id=subject_id).get_absolute_url())
+
+
+# class EditQuestion(LoginRequiredMixin, UpdateView):
+#     form_class = QuestionCreationForm
+#     model = Question
+#     template_name = 'questions/question_edit.html'
+#     context_object_name = 'question_form'
+#
+#     def dispatch(self, request, *args, **kwargs):
+#         if not (is_author_of_subject(request.user, self.kwargs['subject_id']) or
+#                 is_author_of_question(request.user, self.kwargs['question_id'])):
+#             return redirect('questions:question', args=[self.kwargs['subject_id'], self.kwargs['subject_slug'],
+#                                                         self.kwargs['question_id']])
+#         return super(EditQuestion, self).dispatch(request, *args, **kwargs)
+#
+#     def get_object(self, queryset=None):
+#         return get_object_or_404(Question, id=self.kwargs['question_id'])
 
 
 @login_required

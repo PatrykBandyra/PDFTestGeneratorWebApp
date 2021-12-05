@@ -1,5 +1,6 @@
 from django import forms
-from ckeditor.fields import RichTextFormField
+from django.shortcuts import get_object_or_404
+from taggit.forms import TagWidget
 from .models import Subject, Question, Answer
 
 
@@ -19,7 +20,24 @@ class SubjectCreationForm(forms.ModelForm):
 class QuestionCreationForm(forms.ModelForm):
     class Meta:
         model = Question
-        fields = ('question',)
+        fields = ('question', 'tags')
+        widgets = {
+            'tags': TagWidget()
+        }
+
+    # def save(self, commit=True, updated_question_id=None):
+    #     if updated_question_id:
+    #         instance = get_object_or_404(Question, id=updated_question_id)
+    #         instance.question = self.cleaned_data.get('question')
+    #         instance.tags = self.cleaned_data.get('tags')
+    #
+    #     else:
+    #         instance = super().save(commit=False)
+    #
+    #     if commit:
+    #         instance.save()
+    #         self.save_m2m()
+    #     return instance
 
 
 class AnswerCreationForm(forms.ModelForm):

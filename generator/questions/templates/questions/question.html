@@ -20,6 +20,14 @@
                                    href="{% url 'questions:question-edit' question.subject.id question.subject.slug question.id %}">
                                     Edit
                                 </a>
+                                <div class="d-flex justify-content-center">
+                                    {% for tag in question.tags.all %}
+                                        <a
+                                                href="{% url 'questions:subject-by-tag' question.subject.id question.subject.slug tag.slug %}"
+                                                class="badge badge-primary mx-1">{{ tag.name }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
                                 <button type="button" data-mdb-toggle="modal"
                                         data-mdb-target="#delete{{ question.id }}"
                                         class="btn btn-danger my-2 mx-3">

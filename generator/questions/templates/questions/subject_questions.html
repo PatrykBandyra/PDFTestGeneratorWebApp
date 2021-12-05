@@ -7,7 +7,7 @@
 {% block content %}
     <section class="min-vh-100 gradient-custom container-fluid pb-5">
         <h1 class="text-light text-center pt-4">
-            {{ subject.name }}
+            <a class="text-decoration-none text-light" href="{% url 'questions:subject' subject.id subject.slug %}">{{ subject.name }}</a>
         </h1>
 
         <div class="container mx-auto px-auto">
@@ -26,7 +26,11 @@
             </div>
 
             <div class="accordion" id="accordionPanelsStayOpen">
-
+                {% if tag %}
+                    <div class="d-flex justify-content-center">
+                        <h2 class="h2 text-light">Questions with tag: <span class="text-danger">{{ tag.name }}</span></h2>
+                    </div>
+                {% endif %}
                 {#                {% for question in questions %}#}
                 {##}
                 {#                    <div class="accordion-item rounded mt-3">#}
@@ -166,5 +170,9 @@
 {#    }#}
 {#    });#}
 {#    }#}
+{##}
+{#    document.querySelectorAll('pre code').forEach((el) => {#}
+{#    hljs.highlightElement(el);#}
+{#    });#}
 {#    });#}
 {#{% endblock %}#}

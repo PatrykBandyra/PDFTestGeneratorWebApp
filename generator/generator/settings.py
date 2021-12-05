@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'captcha',
     'ckeditor',
     'django_light',  # Disables dark mode in django admin site (ckeditor is bugged when dark mode enabled)
+    'taggit',
 
     'django.contrib.admin',
     'django.contrib.auth',
