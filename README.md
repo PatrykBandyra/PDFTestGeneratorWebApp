@@ -20,6 +20,7 @@ Należy:
 - ustawić:
     - nasłuch bazy danych na porcie 5432
     - hasło administratora bazy danych na: postgres
+- zainstalować rozszerzenie do bazy danych o nazwie: pg_trgm
 - uruchomić bazę danych
 - przejść do katalogu domowego projektu i uruchomić polecenie:
 ```batch
