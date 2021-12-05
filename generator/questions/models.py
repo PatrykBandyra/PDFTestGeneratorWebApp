@@ -39,7 +39,7 @@ class Question(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     edited = models.DateTimeField(auto_now=True)  # Last edition
     last_use = models.DateTimeField(blank=True, null=True)  # Last use in a test
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     class Meta:
         ordering = ('-created',)
