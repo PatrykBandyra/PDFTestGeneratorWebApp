@@ -6,6 +6,10 @@
 
 {% block content %}
     <section class="min-vh-100 gradient-custom container-fluid pb-5">
+        <div class="position-relative top-0 start-0">
+            <a class="btn btn-primary mt-2 ms-4" href="{% url 'account:dashboard' %}">Return to Subjects</a>
+        </div>
+
         <h1 class="text-light text-center pt-4">
             <a class="text-decoration-none text-light"
                href="{% url 'questions:subject' subject.id subject.slug %}">{{ subject.name }}</a>
@@ -28,7 +32,7 @@
 
             <div class="accordion" id="accordionPanelsStayOpen">
                 {% if tag %}
-                    <div class="d-flex justify-content-center">
+                    <div class="d-flex justify-content-center mb-3">
                         <h2 class="h2 text-light">Questions with tag: <span class="text-danger">{{ tag.name }}</span>
                         </h2>
                     </div>
@@ -68,7 +72,7 @@
 
                 {% if tag_query %}
                     <div class="d-flex justify-content-center">
-                        <h2 class="h2 text-light">Questions containing tags: <span
+                        <h2 class="h2 text-light">Questions with tags containing: <span
                                 class="text-danger">{{ tag_query }}</span>
                         </h2>
                     </div>

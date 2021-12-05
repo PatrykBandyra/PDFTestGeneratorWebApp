@@ -6,6 +6,9 @@
 
 {% block content %}
     <section class="min-vh-100 gradient-custom container-fluid">
+        <div class="position-relative top-0 start-0">
+            <a class="btn btn-primary mt-2 ms-4" href="{% url 'questions:subject' subject_id subject_slug %}">Return to Questions</a>
+        </div>
         <div class="container py-5 h-100">
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-12">

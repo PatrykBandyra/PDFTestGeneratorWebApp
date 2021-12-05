@@ -51,7 +51,8 @@ def edit_subject(request, subject_id, subject_slug):
     else:
         subject = get_object_or_404(Subject, id=subject_id)
         subject_form = SubjectCreationForm(instance=subject)
-    return render(request, 'questions/subject_form.html', {'subject_form': subject_form, 'section': 'edit_subject'})
+        return render(request, 'questions/subject_form.html', {'subject_form': subject_form, 'section': 'edit_subject',
+                                                               'subject': subject})
 
 
 @login_required
@@ -100,7 +101,8 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
             # Trigram search
             questions = questions.annotate(
                 similarity=TrigramSimilarity('tags__name', tag_query)
-            ).filter(similarity__gt=0.1).order_by('-similarity')
+            ).filter(similarity__gt=0.1).order_by('id', '-similarity').distinct('id')
+            print(questions)
 
     tag = None
     if tag_slug:
@@ -148,7 +150,8 @@ def create_question(request, subject_id, subject_slug):
             return redirect(new_question.get_absolute_url())
     else:
         question_form = QuestionCreationForm()
-    return render(request, 'questions/question_create.html', {'question_form': question_form})
+    return render(request, 'questions/question_create.html', {'question_form': question_form, 'subject_id': subject_id,
+                                                              'subject_slug': subject_slug})
 
 
 @login_required
@@ -238,7 +241,8 @@ def edit_question(request, subject_id, subject_slug, question_id):
             question_edited = get_object_or_404(Question, id=question_id)
             question_form = QuestionCreationForm(initial={'question': question_edited.question,
                                                           'tags': question_edited.tags.all()})
-            return render(request, 'questions/question_edit.html', {'question_form': question_form})
+            return render(request, 'questions/question_edit.html',
+                          {'question_form': question_form, 'question': question_edited})
 
     else:
         return redirect(get_object_or_404(Subject, id=subject_id).get_absolute_url())
@@ -274,7 +278,8 @@ def add_answer(request, subject_id, subject_slug, question_id):
                 answer_form = AnswerCreationForm(initial={'order': default_order})
             else:
                 answer_form = AnswerCreationForm(initial={'order': 1})
-            return render(request, 'questions/question_add_answer.html', {'answer_form': answer_form})
+            return render(request, 'questions/question_add_answer.html', {'answer_form': answer_form,
+                                                                          'question': question})
 
     else:
         return redirect(get_object_or_404(Subject, id=subject_id).get_absolute_url())
@@ -302,14 +307,17 @@ def edit_answer(request, subject_id, subject_slug, question_id, answer_id):
                     answer_form.add_error('order', 'Choose other ordinal number. '
                                                    'This one has been already assigned to a different answer of this '
                                                    'question.')
-                    return render(request, 'questions/question_edit_answer.html', {'answer_form': answer_form})
+                    return render(request, 'questions/question_edit_answer.html', {'answer_form': answer_form,
+                                                                                   'question': question})
 
         else:  # GET
+            question = get_object_or_404(Question, id=question_id)
             answer_edited = get_object_or_404(Answer, id=answer_id)
             answer_form = AnswerCreationForm(initial={'answer': answer_edited.answer,
                                                       'is_right': answer_edited.is_right,
                                                       'order': answer_edited.order})
-            return render(request, 'questions/question_edit_answer.html', {'answer_form': answer_form})
+            return render(request, 'questions/question_edit_answer.html', {'answer_form': answer_form,
+                                                                           'question': question})
 
     else:
         redirect(get_object_or_404(Subject, id=subject_id).get_absolute_url())
