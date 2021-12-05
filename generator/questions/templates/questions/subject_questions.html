@@ -7,7 +7,8 @@
 {% block content %}
     <section class="min-vh-100 gradient-custom container-fluid pb-5">
         <h1 class="text-light text-center pt-4">
-            <a class="text-decoration-none text-light" href="{% url 'questions:subject' subject.id subject.slug %}">{{ subject.name }}</a>
+            <a class="text-decoration-none text-light"
+               href="{% url 'questions:subject' subject.id subject.slug %}">{{ subject.name }}</a>
         </h1>
 
         <div class="container mx-auto px-auto">
@@ -28,9 +29,51 @@
             <div class="accordion" id="accordionPanelsStayOpen">
                 {% if tag %}
                     <div class="d-flex justify-content-center">
-                        <h2 class="h2 text-light">Questions with tag: <span class="text-danger">{{ tag.name }}</span></h2>
+                        <h2 class="h2 text-light">Questions with tag: <span class="text-danger">{{ tag.name }}</span>
+                        </h2>
                     </div>
                 {% endif %}
+
+                <div class="d-flex justify-content-around mb-5">
+                    <form method="get" class="w-25 text-center">
+
+                        <div class="form-outline form-white mb-4">
+                            {{ search_form.query.errors }}
+                            {{ search_form.query }}
+                            <label class="form-label" for="query">Search in questions and answers</label>
+                        </div>
+
+                        <button type="submit" class="btn-outline-warning btn-rounded">Search</button>
+                    </form>
+
+                    <form method="get" class="w-25 text-center">
+
+                        <div class="form-outline form-white mb-4">
+                            {{ tag_search_form.tag_query.errors }}
+                            {{ tag_search_form.tag_query }}
+                            <label class="form-label" for="tag_query">Search in tags</label>
+                        </div>
+
+                        <button type="submit" class="btn-outline-warning btn-rounded">Search</button>
+                    </form>
+                </div>
+
+                {% if query %}
+                    <div class="d-flex justify-content-center">
+                        <h2 class="h2 text-light">Questions containing: <span
+                                class="text-danger">{{ query }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
+                {% if tag_query %}
+                    <div class="d-flex justify-content-center">
+                        <h2 class="h2 text-light">Questions containing tags: <span
+                                class="text-danger">{{ tag_query }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
                 {#                {% for question in questions %}#}
                 {##}
                 {#                    <div class="accordion-item rounded mt-3">#}

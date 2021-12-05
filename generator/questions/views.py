@@ -1,16 +1,16 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.db.utils import IntegrityError
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
-from django.views.generic.edit import UpdateView
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.views.decorators.http import require_GET, require_http_methods
-from django.db import transaction
-from django.contrib.auth.mixins import LoginRequiredMixin
-from taggit.models import Tag
 import re
-from .forms import SubjectCreationForm, QuestionCreationForm, AnswerCreationForm
+
+from django.contrib.auth.decorators import login_required
+from django.contrib.postgres.search import TrigramSimilarity
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db import transaction
+from django.db.models.functions import Greatest
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_http_methods
+from taggit.models import Tag
+
+from .forms import SubjectCreationForm, QuestionCreationForm, AnswerCreationForm, SearchForm, SearchTagForm
 from .models import Subject, Question, Answer
 from .utils import (is_author_of_subject, is_owner_of_subject, is_author_of_question,
                     is_answer_unique_constraint_fulfilled)
@@ -78,6 +78,30 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
     subject = get_object_or_404(Subject, id=subject_id)
     questions = subject.questions.all()
 
+    # Query search - questions and answers
+    search_form = SearchForm()
+    query = None
+    if 'query' in request.GET:
+        search_form = SearchForm(request.GET)
+        if search_form.is_valid():
+            query = search_form.cleaned_data['query']
+            # Trigram search
+            questions = questions.annotate(
+                similarity=Greatest(TrigramSimilarity('question', query), TrigramSimilarity('answers__answer', query))
+            ).filter(similarity__gt=0.1).order_by('-similarity')
+
+    # Query search - tags
+    tag_search_form = SearchTagForm()
+    tag_query = None
+    if 'tag_query' in request.GET:
+        tag_search_form = SearchTagForm(request.GET)
+        if tag_search_form.is_valid():
+            tag_query = tag_search_form.cleaned_data['tag_query']
+            # Trigram search
+            questions = questions.annotate(
+                similarity=TrigramSimilarity('tags__name', tag_query)
+            ).filter(similarity__gt=0.1).order_by('-similarity')
+
     tag = None
     if tag_slug:
         tag = get_object_or_404(Tag, slug=tag_slug)
@@ -97,10 +121,16 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
         questions_page = paginator.page(paginator.num_pages)
     if request.is_ajax():
         return render(request, 'questions/subject_questions_ajax.html', {'subject': subject, 'questions': questions,
-                                                                         'tag': tag})
+                                                                         'tag': tag, 'query': query,
+                                                                         'search_form': search_form,
+                                                                         'tag_query': tag_query,
+                                                                         'tag_search_form': tag_search_form})
 
     return render(request, 'questions/subject_questions.html', {'subject': subject, 'questions': questions_page,
-                                                                'tag': tag})
+                                                                'tag': tag, 'query': query,
+                                                                'search_form': search_form,
+                                                                'tag_query': tag_query,
+                                                                'tag_search_form': tag_search_form})
 
 
 @login_required
@@ -148,7 +178,7 @@ def question(request, subject_id, subject_slug, question_id):
             elif 'up' in request.POST:
                 answer_to_go_up = get_object_or_404(Answer, id=int(request.POST.get('up')))
                 question = get_object_or_404(Question, id=question_id)
-                answer_to_go_down = question.answers.filter(question=question, order__lt=answer_to_go_up.order)\
+                answer_to_go_down = question.answers.filter(question=question, order__lt=answer_to_go_up.order) \
                     .order_by('-order').first()
                 with transaction.atomic():
                     temp_order = answer_to_go_up.order
@@ -161,7 +191,7 @@ def question(request, subject_id, subject_slug, question_id):
             elif 'down' in request.POST:
                 answer_to_go_down = get_object_or_404(Answer, id=int(request.POST.get('down')))
                 question = get_object_or_404(Question, id=question_id)
-                answer_to_go_up = question.answers.filter(question=question, order__gt=answer_to_go_down.order)\
+                answer_to_go_up = question.answers.filter(question=question, order__gt=answer_to_go_down.order) \
                     .order_by('order').first()
                 with transaction.atomic():
                     temp_order = answer_to_go_down.order
@@ -212,23 +242,6 @@ def edit_question(request, subject_id, subject_slug, question_id):
 
     else:
         return redirect(get_object_or_404(Subject, id=subject_id).get_absolute_url())
-
-
-# class EditQuestion(LoginRequiredMixin, UpdateView):
-#     form_class = QuestionCreationForm
-#     model = Question
-#     template_name = 'questions/question_edit.html'
-#     context_object_name = 'question_form'
-#
-#     def dispatch(self, request, *args, **kwargs):
-#         if not (is_author_of_subject(request.user, self.kwargs['subject_id']) or
-#                 is_author_of_question(request.user, self.kwargs['question_id'])):
-#             return redirect('questions:question', args=[self.kwargs['subject_id'], self.kwargs['subject_slug'],
-#                                                         self.kwargs['question_id']])
-#         return super(EditQuestion, self).dispatch(request, *args, **kwargs)
-#
-#     def get_object(self, queryset=None):
-#         return get_object_or_404(Question, id=self.kwargs['question_id'])
 
 
 @login_required

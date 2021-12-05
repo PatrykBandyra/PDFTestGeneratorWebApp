@@ -25,20 +25,6 @@ class QuestionCreationForm(forms.ModelForm):
             'tags': TagWidget()
         }
 
-    # def save(self, commit=True, updated_question_id=None):
-    #     if updated_question_id:
-    #         instance = get_object_or_404(Question, id=updated_question_id)
-    #         instance.question = self.cleaned_data.get('question')
-    #         instance.tags = self.cleaned_data.get('tags')
-    #
-    #     else:
-    #         instance = super().save(commit=False)
-    #
-    #     if commit:
-    #         instance.save()
-    #         self.save_m2m()
-    #     return instance
-
 
 class AnswerCreationForm(forms.ModelForm):
 
@@ -52,4 +38,24 @@ class AnswerCreationForm(forms.ModelForm):
     class Meta:
         model = Answer
         fields = ('answer', 'is_right', 'order')
+
+
+class SearchForm(forms.Form):
+    query = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control form-control-lg'
+
+
+class SearchTagForm(forms.Form):
+    tag_query = forms.CharField()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control form-control-lg'
 
