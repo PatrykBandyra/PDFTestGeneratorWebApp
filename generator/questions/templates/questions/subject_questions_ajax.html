@@ -3,7 +3,7 @@
     <div class="accordion-item rounded mt-3">
         <nav class="navbar navbar-light bg-transparent">
             <div class="container-fluid">
-                <a class="btn btn-success"
+                <a class="btn btn-success {% if question.author != user %}disabled{% endif %}"
                    href="{% url 'questions:question' subject.id subject.slug question.id %}">
                     Edit
                 </a>
@@ -17,7 +17,7 @@
                 </div>
                 <button type="button" data-mdb-toggle="modal"
                         data-mdb-target="#delete{{ question.id }}"
-                        class="btn btn-danger">
+                        class="btn btn-danger {% if question.author != user %}disabled{% endif %}">
                     Delete
                 </button>
             </div>

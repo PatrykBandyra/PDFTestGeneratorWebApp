@@ -64,7 +64,7 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
             # Check if user is an author of a subject or an author of a question
             question_id = int(request.POST.get('delete'))
             if not is_author_of_question(request.user, question_id) and \
-                    not is_owner_of_subject(request.user, subject_id):
+                    not is_author_of_subject(request.user, subject_id):
                 raise Exception
 
             Question.objects.filter(id=question_id).delete()
@@ -102,7 +102,6 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
             questions = questions.annotate(
                 similarity=TrigramSimilarity('tags__name', tag_query)
             ).filter(similarity__gt=0.1).order_by('id', '-similarity').distinct('id')
-            print(questions)
 
     tag = None
     if tag_slug:

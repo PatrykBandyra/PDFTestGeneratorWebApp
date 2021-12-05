@@ -1,14 +1,17 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView
+from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from questions.models import Subject
+from django.views.decorators.http import require_http_methods
 
 from account.forms import CustomChangePasswordForm
 from questions.utils import is_author_of_subject
 
 
 @login_required
+@require_http_methods(['GET', 'POST'])
 def dashboard(request):
     # Subject deletion
     if request.method == 'POST':
@@ -30,3 +33,4 @@ def dashboard(request):
 
 class CustomChangePasswordView(LoginRequiredMixin, PasswordChangeView):
     form_class = CustomChangePasswordForm
+    success_url = '/password_change/done/'
