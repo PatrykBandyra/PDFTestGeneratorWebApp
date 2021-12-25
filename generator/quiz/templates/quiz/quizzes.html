@@ -61,10 +61,17 @@
                                             </a>
                                             <ul class="dropdown-menu">
                                                 <li>
-                                                    <a href="#"
+                                                    <a href="{% url 'quiz:edit-quiz' subject.id subject.slug quiz.id quiz.slug %}"
                                                        class="dropdown-item btn btn-info">
                                                         Edit Test
                                                     </a>
+                                                </li>
+                                                <li>
+                                                    <button type="button" data-mdb-toggle="modal"
+                                                            data-mdb-target="#copy{{ quiz.id }}"
+                                                            class="dropdown-item btn btn-info">
+                                                        Copy Test
+                                                    </button>
                                                 </li>
                                                 <li>
                                                     <button type="button" data-mdb-toggle="modal"
@@ -77,6 +84,30 @@
 
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal" tabindex="-1" role="dialog" id="copy{{ quiz.id }}">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Copy Test</h5>
+                                    <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Are you sure you want to copy {{ quiz.name }}?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="copy" value="{{ quiz.id }}">
+                                        <button type="submit" class="btn btn-danger">Yes, copy</button>
+                                    </form>
+                                    <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
+                                        No, cancel
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -109,6 +140,10 @@
                 {% endfor %}
 
             </div>
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center mt-5">
+            {% include 'quiz/pagination.html' with page=quizzes %}
         </div>
 
         <div class="position-fixed bottom-0 end-0 mb-3 me-3" style="z-index: 9999">

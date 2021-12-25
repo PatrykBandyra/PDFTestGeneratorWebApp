@@ -108,7 +108,7 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
         tag = get_object_or_404(Tag, slug=tag_slug)
         questions = questions.filter(tags__in=[tag])
 
-    paginator = Paginator(questions, 6)
+    paginator = Paginator(questions, 10)
     page = request.GET.get('page')
     try:
         questions_page = paginator.page(page)
