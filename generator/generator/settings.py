@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     # Custom
     'account.apps.AccountConfig',
     'questions.apps.QuestionsConfig',
-    'tests.apps.TestsConfig',
+    'quiz.apps.QuizConfig',
 
     # Third parties
     'captcha',

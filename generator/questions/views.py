@@ -121,7 +121,8 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
         # If page value is bigger than the value of last page - get last page
         questions_page = paginator.page(paginator.num_pages)
     if request.is_ajax():
-        return render(request, 'questions/subject_questions_ajax.html', {'subject': subject, 'questions': questions,
+        return render(request, 'questions/subject_questions_ajax.html', {'subject': subject,
+                                                                         'questions': questions_page,
                                                                          'tag': tag, 'query': query,
                                                                          'search_form': search_form,
                                                                          'tag_query': tag_query,

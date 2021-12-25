@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('dashboard/', include('questions.urls', namespace='questions')),
+    path('dashboard/', include('quiz.urls', namespace='quiz')),
     path('', include('account.urls', namespace='account')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
