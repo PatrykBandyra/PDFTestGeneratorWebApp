@@ -3,17 +3,21 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models.functions import Greatest
 from django.urls import reverse
 from questions.models import Subject
+from taggit.models import Tag
 from .forms import QuizCreationForm
 from .utils import is_author_of_quiz
 from .models import Quiz
 from questions.utils import is_author_of_subject
+from questions.forms import SearchForm, SearchTagForm
 
 
 @login_required
 @require_http_methods(['GET', 'POST'])
-def quizzes(request, subject_id, subject_slug):
+def quizzes(request, subject_id, subject_slug, tag_slug=None):
     if request.method == 'POST':
 
         # Quiz deletion
@@ -52,6 +56,35 @@ def quizzes(request, subject_id, subject_slug):
     subject = get_object_or_404(Subject, id=subject_id)
     quizzes = subject.quizzes.all().order_by('-id')
 
+    # Query search - questions and answers
+    search_form = SearchForm()
+    query = None
+    if 'query' in request.GET:
+        search_form = SearchForm(request.GET)
+        if search_form.is_valid():
+            query = search_form.cleaned_data['query']
+            # Trigram search
+            quizzes = quizzes.annotate(
+                similarity=Greatest(TrigramSimilarity('name', query), TrigramSimilarity('description', query))
+            ).filter(similarity__gt=0.1).order_by('-similarity')
+
+    # Query search - tags
+    tag_search_form = SearchTagForm()
+    tag_query = None
+    if 'tag_query' in request.GET:
+        tag_search_form = SearchTagForm(request.GET)
+        if tag_search_form.is_valid():
+            tag_query = tag_search_form.cleaned_data['tag_query']
+            # Trigram search
+            quizzes = quizzes.annotate(
+                similarity=TrigramSimilarity('tags__name', tag_query)
+            ).filter(similarity__gt=0.1).order_by('id', '-similarity').distinct('id')
+
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        quizzes = quizzes.filter(tags__in=[tag])
+
     paginator = Paginator(quizzes, 12)
     page = request.GET.get('page')
     try:
@@ -69,7 +102,11 @@ def quizzes(request, subject_id, subject_slug):
         authorial_quizzes = request.user.quizzes.filter(subject_id=subject_id).all()
     return render(request, 'quiz/quizzes.html', {'quizzes': quizzes_page,
                                                  'authorial_quizzes': authorial_quizzes,
-                                                 'subject': subject})
+                                                 'subject': subject,
+                                                 'tag': tag, 'query': query,
+                                                 'search_form': search_form,
+                                                 'tag_query': tag_query,
+                                                 'tag_search_form': tag_search_form})
 
 
 @login_required
@@ -82,6 +119,7 @@ def create_quiz(request, subject_id, subject_slug):
             new_quiz.author = request.user
             new_quiz.subject = get_object_or_404(Subject, id=subject_id)
             new_quiz.save()
+            quiz_form.save_m2m()
             return redirect(reverse('quiz:quizzes', args=[subject_id, subject_slug]))
     else:
         quiz_form = QuizCreationForm()
@@ -127,4 +165,5 @@ def edit_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug):
 @login_required
 @require_http_methods(['GET', 'POST'])
 def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug):
-    pass
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    return render(request, 'quiz/quiz.html', {'quiz': quiz})

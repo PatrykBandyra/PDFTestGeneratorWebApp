@@ -14,8 +14,12 @@
         </div>
 
         <h1 class="text-light text-center pt-4">
-            {{ subject.name }} <br>
-            Tests
+
+            <a class="text-decoration-none text-light"
+               href="{% url 'quiz:quizzes' subject.id subject.slug %}">
+                {{ subject.name }} <br>
+                Tests
+            </a>
         </h1>
 
         <div class="container mx-auto px-auto">
@@ -33,6 +37,55 @@
                 </div>
             </div>
 
+            <div class="accordion" id="accordionPanelsStayOpen">
+                {% if tag %}
+                    <div class="d-flex justify-content-center mb-3">
+                        <h2 class="h2 text-light">Quizzes with tag: <span class="text-danger">{{ tag.name }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-around mb-5">
+                    <form method="get" class="w-25 text-center">
+
+                        <div class="form-outline form-white mb-4">
+                            {{ search_form.query.errors }}
+                            {{ search_form.query }}
+                            <label class="form-label" for="query">Search in test names and descriptions</label>
+                        </div>
+
+                        <button type="submit" class="btn-outline-warning btn-rounded">Search</button>
+                    </form>
+
+                    <form method="get" class="w-25 text-center">
+
+                        <div class="form-outline form-white mb-4">
+                            {{ tag_search_form.tag_query.errors }}
+                            {{ tag_search_form.tag_query }}
+                            <label class="form-label" for="tag_query">Search in tags</label>
+                        </div>
+
+                        <button type="submit" class="btn-outline-warning btn-rounded">Search</button>
+                    </form>
+                </div>
+
+                {% if query %}
+                    <div class="d-flex justify-content-center">
+                        <h2 class="h2 text-light">Tests containing: <span
+                                class="text-danger">{{ query }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
+                {% if tag_query %}
+                    <div class="d-flex justify-content-center">
+                        <h2 class="h2 text-light">Tests with tags containing: <span
+                                class="text-danger">{{ tag_query }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+            </div>
+
             <div class="row row-cols-1 row-cols-md-2 g-4 pb-3 px-auto mx-auto">
                 {% for quiz in quizzes %}
 
@@ -43,6 +96,16 @@
                                 <p class="small text-muted">
                                     Created by {{ quiz.author.username }}
                                 </p>
+
+                                <div class="d-flex justify-content-center mb-3">
+                                    {% for tag in quiz.tags.all %}
+                                        <a
+                                                href="{% url 'quiz:quiz-by-tag' subject.id subject.slug tag.slug %}"
+                                                class="badge badge-primary mx-1">{{ tag.name }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+
                                 <p class="card-text pb-4">
                                     {{ quiz.description }}
                                 </p>
@@ -50,8 +113,8 @@
                                 <div class="container position-absolute bottom-0">
                                     <div class="row">
                                         <div class="col-8 col-md-8 me-auto">
-                                            <a href="#" class="btn btn-primary">See
-                                                Questions</a>
+                                            <a href="{% url 'quiz:quiz' subject.id subject.slug quiz.id quiz.slug %}"
+                                               class="btn btn-primary">See Questions</a>
                                         </div>
                                         <div class="col-4 nav-item dropdown">
                                             <a class="nav-link dropdown-toggle {% if quiz not in authorial_quizzes %}disabled{% endif %}"
