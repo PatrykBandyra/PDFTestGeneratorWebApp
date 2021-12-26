@@ -3,14 +3,15 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib.postgres.search import TrigramSimilarity
+from django.contrib.postgres.search import TrigramSimilarity, SearchHeadline, SearchQuery, SearchVector, SearchRank
 from django.db.models.functions import Greatest
 from django.urls import reverse
-from questions.models import Subject
+from questions.models import Subject, Question
 from taggit.models import Tag
+from django.db.models.query import QuerySet
 from .forms import QuizCreationForm
 from .utils import is_author_of_quiz
-from .models import Quiz
+from .models import Quiz, QuizQuestion
 from questions.utils import is_author_of_subject
 from questions.forms import SearchForm, SearchTagForm
 
@@ -164,6 +165,76 @@ def edit_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug):
 
 @login_required
 @require_http_methods(['GET', 'POST'])
-def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug):
+def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
     quiz = get_object_or_404(Quiz, id=quiz_id)
-    return render(request, 'quiz/quiz.html', {'quiz': quiz})
+
+    # Remove question from
+    if request.method == 'POST':
+        try:
+            # Check if user is an author of a subject or an author of a quiz
+            question_id = int(request.POST.get('delete'))
+            if not is_author_of_quiz(request.user, question_id) and \
+                    not is_author_of_subject(request.user, subject_id):
+                raise Exception
+
+            QuizQuestion.objects.filter(quiz_id=quiz.id, question_id=question_id).delete()
+        except Exception:
+            pass
+
+    quiz_questions = quiz.quiz_questions.order_by('-order').all()
+    questions_ids = [quiz_question.question.id for quiz_question in quiz_questions]
+
+    questions = Question.objects.filter(id__in=questions_ids).all()
+
+    # Query search - questions and answers
+    search_form = SearchForm()
+    q = None
+    if 'query' in request.GET:
+        search_form = SearchForm(request.GET)
+        if search_form.is_valid():
+            q = search_form.cleaned_data['query']
+            # Trigram search
+            # questions = questions.annotate(
+            #     similarity=Greatest(TrigramSimilarity('question', query), TrigramSimilarity('answers__answer', query))
+            # ).filter(similarity__gt=0.1).order_by('-similarity')
+
+            # Rank search
+            vector = SearchVector('question', 'answers__answer')
+            query = SearchQuery(q)
+            questions = questions.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.001).order_by('-rank')
+
+    # Query search - tags
+    tag_search_form = SearchTagForm()
+    tag_query = None
+    if 'tag_query' in request.GET:
+        tag_search_form = SearchTagForm(request.GET)
+        if tag_search_form.is_valid():
+            tag_query = tag_search_form.cleaned_data['tag_query']
+            # Trigram search
+            questions = questions.annotate(
+                similarity=TrigramSimilarity('tags__name', tag_query)
+            ).filter(similarity__gt=0.1).order_by('id', '-similarity').distinct('id')
+
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        questions = questions.filter(tags__in=[tag])
+
+    paginator = Paginator(questions, 10)
+    page = request.GET.get('page')
+    try:
+        questions_page = paginator.page(page)
+    except PageNotAnInteger:
+        # If page value is not int - get first page
+        questions_page = paginator.page(1)
+    except EmptyPage:
+        # If page value is bigger than the value of last page - get last page
+        questions_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'quiz/quiz.html', {'quiz': quiz,
+                                              'subject': quiz.subject,
+                                              'questions': questions_page,
+                                              'tag': tag, 'query': q,
+                                              'search_form': search_form,
+                                              'tag_query': tag_query,
+                                              'tag_search_form': tag_search_form})

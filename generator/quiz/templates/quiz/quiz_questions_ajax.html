@@ -1,0 +1,85 @@
+{% for question in questions %}
+
+    <div class="accordion-item rounded mt-3">
+        <nav class="navbar navbar-light bg-transparent">
+            <div class="container-fluid">
+                <a class="btn btn-success {% if question.author != user %}disabled{% endif %}"
+                   href="{% url 'questions:question' subject.id subject.slug question.id %}">
+                    Edit
+                </a>
+                <div class="d-flex justify-content-center">
+                    {% for tag in question.tags.all %}
+                        <a
+                                href="{% url 'quiz:quiz-questions-by-tag' question.subject.id question.subject.slug quiz.id quiz.slug tag.slug %}"
+                                class="badge badge-primary mx-1">{{ tag.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+                <button type="button" data-mdb-toggle="modal"
+                        data-mdb-target="#delete{{ question.id }}"
+                        class="btn btn-danger {% if quiz.author != user and subject.author != user %}disabled{% endif %}">
+                    Remove from Test
+                </button>
+            </div>
+        </nav>
+
+        <h2 class="accordion-header" id="heading{{ question.id }}">
+            <button class="accordion-button d-block collapsed" type="button" data-mdb-toggle="collapse"
+                    data-mdb-target="#panelsStayOpen-collapse{{ question.id }}">
+                {{ question.question|safe }}
+            </button>
+        </h2>
+        <div id="panelsStayOpen-collapse{{ question.id }}" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <div class="d-flex justify-content-center border-bottom border-dark mb-2">
+                    <h3 class="h3">Answers</h3>
+                </div>
+
+                {% for answer in question.answers.all %}
+                    {% if answer.is_right %}
+                        <div class="p-2 my-2" style="border: 3px green solid; border-radius: 15px">
+                            {{ answer.answer|safe }}
+                        </div>
+                    {% else %}
+                        <div class="p-2 my-2" style="border: 3px red solid; border-radius: 15px">
+                            {{ answer.answer|safe }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    {# Delete dialog #}
+    <div class="modal" tabindex="-1" role="dialog" id="delete{{ question.id }}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Remove Question from Test</h5>
+                    <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to remove the question from the test?</p>
+                </div>
+                <div class="modal-footer">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="delete" value="{{ question.id }}">
+                        <button type="submit" class="btn btn-danger">Yes, remove</button>
+                    </form>
+                    <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
+                        No, cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% empty %}
+
+    <div class="d-flex justify-content-center mt-5">
+        <h1 class="h1 text-danger">No questions</h1>
+    </div>
+
+{% endfor %}

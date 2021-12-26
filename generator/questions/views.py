@@ -1,7 +1,7 @@
 import re
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.postgres.search import TrigramSimilarity
+from django.contrib.postgres.search import TrigramSimilarity, SearchVector, SearchQuery, SearchRank
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import transaction
 from django.db.models.functions import Greatest
@@ -81,15 +81,20 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
 
     # Query search - questions and answers
     search_form = SearchForm()
-    query = None
+    q = None
     if 'query' in request.GET:
         search_form = SearchForm(request.GET)
         if search_form.is_valid():
-            query = search_form.cleaned_data['query']
-            # Trigram search
-            questions = questions.annotate(
-                similarity=Greatest(TrigramSimilarity('question', query), TrigramSimilarity('answers__answer', query))
-            ).filter(similarity__gt=0.1).order_by('-similarity')
+            q = search_form.cleaned_data['query']
+            # # Trigram search
+            # questions = questions.annotate(
+            #     similarity=Greatest(TrigramSimilarity('question', query), TrigramSimilarity('answers__answer', query))
+            # ).filter(similarity__gt=0.1).order_by('-similarity')
+
+            # Rank search
+            vector = SearchVector('question', 'answers__answer')
+            query = SearchQuery(q)
+            questions = questions.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.001).order_by('-rank')
 
     # Query search - tags
     tag_search_form = SearchTagForm()
@@ -123,13 +128,13 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
     if request.is_ajax():
         return render(request, 'questions/subject_questions_ajax.html', {'subject': subject,
                                                                          'questions': questions_page,
-                                                                         'tag': tag, 'query': query,
+                                                                         'tag': tag, 'query': q,
                                                                          'search_form': search_form,
                                                                          'tag_query': tag_query,
                                                                          'tag_search_form': tag_search_form})
 
     return render(request, 'questions/subject_questions.html', {'subject': subject, 'questions': questions_page,
-                                                                'tag': tag, 'query': query,
+                                                                'tag': tag, 'query': q,
                                                                 'search_form': search_form,
                                                                 'tag_query': tag_query,
                                                                 'tag_search_form': tag_search_form})

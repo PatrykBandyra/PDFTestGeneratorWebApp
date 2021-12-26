@@ -1,5 +1,162 @@
 {% extends 'base.html' %}
 
 {% block title %}
+    {{ quiz.name }}
+{% endblock %}
+
+{% block content %}
+
+    <section class="min-vh-100 gradient-custom container-fluid pb-5">
+        <div class="d-flex justify-content-between position-relative top-0 start-0">
+            <a class="btn btn-primary mt-2 ms-4" href="{% url 'quiz:quizzes' subject.id subject.slug %}">
+                Return to Tests
+            </a>
+            <div>
+                <a class="btn btn-success mt-2" href="{% url 'quiz:edit-quiz' subject.id subject.slug quiz.id quiz.slug %}">
+                    Edit Test
+                </a>
+                <a class="btn btn-danger mt-2 ms-2" href="#">
+                    Delete Test
+                </a>
+                <a class="btn btn-primary mt-2 ms-2" href="#">
+                    Randomize Question Order
+                </a>
+                <a class="btn btn-primary mt-2 ms-2" href="#">
+                    Print Test
+                </a>
+            </div>
+        </div>
+
+        <h1 class="text-light text-center pt-4">
+            <a class="text-decoration-none text-light"
+               href="{% url 'quiz:quiz' subject.id subject.slug quiz.id quiz.slug %}">
+                {{ subject.name }} <br>
+                {{ quiz.name }}
+            </a>
+        </h1>
+
+        <div class="container mx-auto px-auto">
+
+            {% if quiz.tags %}
+                <div class="text-center">
+                    {% for tag in quiz.tags.all %}
+                        <a
+                                href="{% url 'quiz:quiz-by-tag' subject.id subject.slug tag.slug %}"
+                                class="badge badge-primary mx-1">{{ tag.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if quiz.description %}
+                <p class="text-light text-center mt-3">
+                    {{ quiz.description }}
+                </p>
+            {% endif %}
+
+            <div class="row my-3 row-cols-1 row-cols-md-2 pb-3">
+                <div class="card col-md-12 bg-dark text-light my-3 py-2">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Add Question to the Test</h5>
+                        <p class="card-text text-center">
+                            <a href="#">
+                                <i class="fas fa-plus fa-5x mt-4"></i>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion" id="accordionPanelsStayOpen">
+                {% if tag %}
+                    <div class="d-flex justify-content-center mb-3">
+                        <h2 class="h2 text-light">Test questions with tag: <span class="text-danger">{{ tag.name }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-around mb-5">
+                    <form method="get" class="w-25 text-center">
+
+                        <div class="form-outline form-white mb-4">
+                            {{ search_form.query.errors }}
+                            {{ search_form.query }}
+                            <label class="form-label" for="query">Search in questions and answers</label>
+                        </div>
+
+                        <button type="submit" class="btn-outline-warning btn-rounded">Search</button>
+                    </form>
+
+                    <form method="get" class="w-25 text-center">
+
+                        <div class="form-outline form-white mb-4">
+                            {{ tag_search_form.tag_query.errors }}
+                            {{ tag_search_form.tag_query }}
+                            <label class="form-label" for="tag_query">Search in tags</label>
+                        </div>
+
+                        <button type="submit" class="btn-outline-warning btn-rounded">Search</button>
+                    </form>
+                </div>
+
+                {% if query %}
+                    <div class="d-flex justify-content-center">
+                        <h2 class="h2 text-light">Questions containing: <span
+                                class="text-danger">{{ query }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
+                {% if tag_query %}
+                    <div class="d-flex justify-content-center">
+                        <h2 class="h2 text-light">Questions with tags containing: <span
+                                class="text-danger">{{ tag_query }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
+                <div id="question-list">
+                    {% include 'quiz/quiz_questions_ajax.html' %}
+                </div>
+
+            </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center mt-5">
+            {% include 'quiz/pagination.html' with page=questions %}
+        </div>
+
+        <div class="position-fixed bottom-0 end-0 mb-3 me-3" style="z-index: 9999">
+            <button type="button" class="btn btn-warning btn-floating btn-lg" id="scrollBtn" style="display: none">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+        </div>
+
+    </section>
+
+
+    <script>
+        let scrollBtn = document.getElementById("scrollBtn");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollBtn.style.display = "block";
+            } else {
+                scrollBtn.style.display = "none";
+            }
+        }
+
+        scrollBtn.addEventListener("click", topFunction);
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    </script>
 
 {% endblock %}

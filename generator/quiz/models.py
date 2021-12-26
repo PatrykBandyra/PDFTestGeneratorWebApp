@@ -43,9 +43,13 @@ class QuizQuestion(models.Model):
         required_db_features = {
             'supports_deferrable_unique_constraints'
         }
-        constraints = [
+        constraints = [models.UniqueConstraint(
+                fields=['quiz', 'question'],
+                name='quiz_questions_unique',
+                deferrable=models.Deferrable.DEFERRED,
+            ),
             models.UniqueConstraint(
-                fields=['quiz', 'order'],
+                fields=['quiz', 'question', 'order'],
                 name='quiz_questions_order_unique',
                 deferrable=models.Deferrable.DEFERRED,
             )
