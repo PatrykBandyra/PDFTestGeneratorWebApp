@@ -237,7 +237,11 @@ def edit_question(request, subject_id, subject_slug, question_id):
 
                 # Add tags
                 for tag in re.split(', |,| ', question_form.data.get('tags')):
-                    question_edited.tags.add(tag.strip())
+                    tag = tag.strip()
+                    if tag != '':
+                        question_edited.tags.add(tag)
+
+
                 question_edited.save()
 
             return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())

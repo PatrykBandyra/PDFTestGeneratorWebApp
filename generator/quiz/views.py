@@ -151,7 +151,9 @@ def edit_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug):
 
             # Add tags
             for tag in re.split(', |,| ', quiz_form.data.get('tags')):
-                quiz.tags.add(tag.strip())
+                tag = tag.strip()
+                if tag != '':
+                    quiz.tags.add(tag)
 
             quiz.save()
             return redirect(reverse('quiz:quizzes', args=[subject_id, subject_slug]))
