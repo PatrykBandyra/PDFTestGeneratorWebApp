@@ -156,13 +156,21 @@ def edit_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug):
                     quiz.tags.add(tag)
 
             quiz.save()
+
+            ret = request.GET.get('ret')
+            if ret:
+                return redirect(ret)
+
             return redirect(reverse('quiz:quizzes', args=[subject_id, subject_slug]))
     else:
         quiz = get_object_or_404(Quiz, id=quiz_id)
         subject = get_object_or_404(Subject, id=subject_id)
         quiz_form = QuizCreationForm(instance=quiz)
+
+        ret = request.GET.get('ret')
+
         return render(request, 'quiz/quiz_create.html', {'quiz_form': quiz_form, 'section': 'edit_quiz',
-                                                         'quiz': quiz, 'subject': subject})
+                                                         'quiz': quiz, 'subject': subject, 'ret': ret})
 
 
 @login_required
@@ -172,16 +180,36 @@ def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
 
     # Remove question from
     if request.method == 'POST':
-        try:
-            # Check if user is an author of a subject or an author of a quiz
-            question_id = int(request.POST.get('delete'))
-            if not is_author_of_quiz(request.user, question_id) and \
-                    not is_author_of_subject(request.user, subject_id):
-                raise Exception
 
-            QuizQuestion.objects.filter(quiz_id=quiz.id, question_id=question_id).delete()
-        except Exception:
-            pass
+        # Quiz deletion
+        quiz_to_delete_id = request.POST.get('delete_quiz')
+        if quiz_to_delete_id:
+            try:
+                quiz_to_delete_id = int(quiz_to_delete_id)
+                # Check if user is an author of a quiz or an author of a subject - only those can delete a quiz
+                if not is_author_of_quiz(request.user, quiz_to_delete_id) and \
+                        not is_author_of_subject(request.user, subject_id):
+                    raise Exception
+
+                Quiz.objects.get(id=quiz_to_delete_id).delete()
+
+                return redirect(reverse('quiz:quizzes', args=[subject_id, subject_slug]))
+
+            except Exception:
+                return redirect(reverse('quiz:quizzes', args=[subject_id, subject_slug]))
+
+        question_id = request.POST.get('delete')
+        if question_id:
+            try:
+                # Check if user is an author of a subject or an author of a quiz
+                question_id = int(request.POST.get('delete'))
+                if not is_author_of_quiz(request.user, question_id) and \
+                        not is_author_of_subject(request.user, subject_id):
+                    raise Exception
+
+                QuizQuestion.objects.filter(quiz_id=quiz.id, question_id=question_id).delete()
+            except Exception:
+                pass
 
     quiz_questions = quiz.quiz_questions.order_by('-order').all()
     questions_ids = [quiz_question.question.id for quiz_question in quiz_questions]

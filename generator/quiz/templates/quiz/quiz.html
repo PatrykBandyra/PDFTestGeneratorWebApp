@@ -12,12 +12,15 @@
                 Return to Tests
             </a>
             <div>
-                <a class="btn btn-success mt-2" href="{% url 'quiz:edit-quiz' subject.id subject.slug quiz.id quiz.slug %}">
+                <a class="btn btn-success mt-2"
+                   href="{% url 'quiz:edit-quiz' subject.id subject.slug quiz.id quiz.slug %}?ret={{ request.build_absolute_uri }}">
                     Edit Test
                 </a>
-                <a class="btn btn-danger mt-2 ms-2" href="#">
+                <button type="button" data-mdb-toggle="modal"
+                        data-mdb-target="#delete{{ quiz.id }}"
+                        class="btn btn-danger mt-2 ms-2">
                     Delete Test
-                </a>
+                </button>
                 <a class="btn btn-primary mt-2 ms-2" href="#">
                     Randomize Question Order
                 </a>
@@ -70,7 +73,8 @@
             <div class="accordion" id="accordionPanelsStayOpen">
                 {% if tag %}
                     <div class="d-flex justify-content-center mb-3">
-                        <h2 class="h2 text-light">Test questions with tag: <span class="text-danger">{{ tag.name }}</span>
+                        <h2 class="h2 text-light">Test questions with tag: <span
+                                class="text-danger">{{ tag.name }}</span>
                         </h2>
                     </div>
                 {% endif %}
@@ -129,6 +133,31 @@
             <button type="button" class="btn btn-warning btn-floating btn-lg" id="scrollBtn" style="display: none">
                 <i class="fas fa-arrow-up"></i>
             </button>
+        </div>
+
+
+        <div class="modal" tabindex="-1" role="dialog" id="delete{{ quiz.id }}">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete Test</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete {{ quiz.name }}?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="delete_quiz" value="{{ quiz.id }}">
+                            <button type="submit" class="btn btn-danger">Yes, delete</button>
+                        </form>
+                        <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
+                            No, cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </section>

@@ -8,8 +8,16 @@
     <section class="min-vh-100 gradient-custom container-fluid">
 
         <div class="position-relative top-0 start-0">
-            <a class="btn btn-primary mt-2 ms-4" href="{% url 'quiz:quizzes' subject.id subject.slug %}">Return to
-                Tests</a>
+            {% if ret %}
+                <a class="btn btn-primary mt-2 ms-4" href="{{ ret }}">
+                    Return to Test
+                </a>
+            {% else %}
+                <a class="btn btn-primary mt-2 ms-4" href="{% url 'quiz:quizzes' subject.id subject.slug %}">
+                    Return to Tests
+                </a>
+            {% endif %}
+
         </div>
 
         <div class="container mx-auto px-auto my-5">
