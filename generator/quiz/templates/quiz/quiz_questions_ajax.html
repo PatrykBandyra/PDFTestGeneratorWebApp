@@ -2,18 +2,60 @@
 
     <div class="accordion-item rounded mt-3">
         <nav class="navbar navbar-light bg-transparent">
-            <div class="container-fluid">
-                <a class="btn btn-success {% if question.author != user %}disabled{% endif %}"
-                   href="{% url 'questions:question' subject.id subject.slug question.id %}">
-                    Edit
-                </a>
-                <div class="d-flex justify-content-center">
+
+            <div class="container-fluid d-flex justify-content-center mb-2">
+                <div>
                     {% for tag in question.tags.all %}
                         <a
                                 href="{% url 'quiz:quiz-questions-by-tag' question.subject.id question.subject.slug quiz.id quiz.slug tag.slug %}"
                                 class="badge badge-primary mx-1">{{ tag.name }}
                         </a>
                     {% endfor %}
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <a class="btn btn-success {% if question.author != user %}disabled{% endif %}"
+                   href="{% url 'questions:question' subject.id subject.slug question.id %}">
+                    Edit
+                </a>
+                <div class="d-flex text-center">
+
+                    <div class="ms-5 ps-5">
+                        {% if forloop.first and forloop.first != forloop.last %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="down" value="{{ question.id }}">
+                                <button type="submit" class="btn btn-primary btn-floating btn-md">
+                                    <i class="fas fa-arrow-down"></i>
+                                </button>
+                            </form>
+                        {% elif forloop.last and forloop.first != forloop.last %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="up" value="{{ question.id }}">
+                                <button type="submit" class="btn btn-primary btn-floating btn-md">
+                                    <i class="fas fa-arrow-up"></i>
+                                </button>
+                            </form>
+                        {% elif not forloop.first and not forloop.last %}
+                            <form method="post" class="me-1" style="float: left">
+                                {% csrf_token %}
+                                <input type="hidden" name="down" value="{{ question.id }}">
+                                <button type="submit" class="btn btn-primary btn-floating btn-md">
+                                    <i class="fas fa-arrow-down"></i>
+                                </button>
+                            </form>
+                            <form method="post" class="ms-1" style="float:left;">
+                                {% csrf_token %}
+                                <input type="hidden" name="up" value="{{ question.id }}">
+                                <button type="submit" class="btn btn-primary btn-floating btn-md">
+                                    <i class="fas fa-arrow-up"></i>
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
                 </div>
                 <button type="button" data-mdb-toggle="modal"
                         data-mdb-target="#delete{{ question.id }}"

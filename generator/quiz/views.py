@@ -214,6 +214,50 @@ def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
             except Exception:
                 pass
 
+        if 'up' in request.POST:
+            question_to_go_up = get_object_or_404(Question, id=int(request.POST.get('up')))
+            quiz = get_object_or_404(Quiz, id=quiz_id)
+
+            # Check rights to modify order
+            if not is_author_of_quiz(request.user, question_id) and \
+                    not is_author_of_subject(request.user, subject_id):
+                return redirect(reverse('quiz:quiz', args=[subject_id, subject_slug, quiz_id, quiz_slug]))
+
+            quiz_question_to_go_up = QuizQuestion.objects.get(quiz_id=quiz.id, question_id=question_to_go_up.id)
+            quiz_question_to_go_down = QuizQuestion.objects.filter(quiz_id=quiz.id,
+                                                                   order__lt=quiz_question_to_go_up.order) \
+                .order_by('-order').first()
+
+            with transaction.atomic():
+                temp_order = quiz_question_to_go_up.order
+                quiz_question_to_go_up.order = quiz_question_to_go_down.order
+                quiz_question_to_go_down.order = temp_order
+                quiz_question_to_go_up.save()
+                quiz_question_to_go_down.save()
+            return redirect(reverse('quiz:quiz', args=[subject_id, subject_slug, quiz_id, quiz_slug]))
+
+        elif 'down' in request.POST:
+            question_to_go_down = get_object_or_404(Question, id=int(request.POST.get('down')))
+            quiz = get_object_or_404(Quiz, id=quiz_id)
+
+            # Check rights to modify order
+            if not is_author_of_quiz(request.user, question_id) and \
+                    not is_author_of_subject(request.user, subject_id):
+                return redirect(reverse('quiz:quiz', args=[subject_id, subject_slug, quiz_id, quiz_slug]))
+
+            quiz_question_to_go_down = QuizQuestion.objects.get(quiz_id=quiz.id, question_id=question_to_go_down.id)
+            quiz_question_to_go_up = QuizQuestion.objects.filter(quiz_id=quiz.id,
+                                                                 order__gt=quiz_question_to_go_down.order) \
+                .order_by('order').first()
+
+            with transaction.atomic():
+                temp_order = quiz_question_to_go_down.order
+                quiz_question_to_go_down.order = quiz_question_to_go_up.order
+                quiz_question_to_go_up.order = temp_order
+                quiz_question_to_go_down.save()
+                quiz_question_to_go_up.save()
+            return redirect(reverse('quiz:quiz', args=[subject_id, subject_slug, quiz_id, quiz_slug]))
+
         # Randomize question order
         randomize = request.POST.get('randomize')
         if randomize == 'yes':
