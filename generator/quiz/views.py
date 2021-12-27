@@ -1,10 +1,12 @@
 import re
+import random
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.postgres.search import TrigramSimilarity, SearchHeadline, SearchQuery, SearchVector, SearchRank
 from django.db.models.functions import Greatest
+from django.db import transaction
 from django.urls import reverse
 from questions.models import Subject, Question
 from taggit.models import Tag
@@ -198,6 +200,7 @@ def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
             except Exception:
                 return redirect(reverse('quiz:quizzes', args=[subject_id, subject_slug]))
 
+        # Remove question from test
         question_id = request.POST.get('delete')
         if question_id:
             try:
@@ -211,10 +214,22 @@ def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
             except Exception:
                 pass
 
+        # Randomize question order
+        randomize = request.POST.get('randomize')
+        if randomize == 'yes':
+            quiz_questions = QuizQuestion.objects.filter(quiz_id=quiz.id).all()
+            questions_order = [qq.order for qq in quiz_questions]
+            random.shuffle(questions_order)
+            with transaction.atomic():
+                for qq, order in zip(quiz_questions, questions_order):
+                    qq.order = order
+                    qq.save()
+
+    # GET/POST
     quiz_questions = quiz.quiz_questions.order_by('-order').all()
     questions_ids = [quiz_question.question.id for quiz_question in quiz_questions]
 
-    questions = Question.objects.filter(id__in=questions_ids).all()
+    questions = Question.objects.filter(id__in=questions_ids).order_by('question_quizzes__order').all()
 
     # Query search - questions and answers
     search_form = SearchForm()

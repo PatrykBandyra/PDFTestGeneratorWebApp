@@ -21,9 +21,11 @@
                         class="btn btn-danger mt-2 ms-2">
                     Delete Test
                 </button>
-                <a class="btn btn-primary mt-2 ms-2" href="#">
-                    Randomize Question Order
-                </a>
+                <form method="post" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="randomize" value="yes">
+                    <button type="submit" class="btn btn-primary mt-2 ms-2">Randomize Question Order</button>
+                </form>
                 <a class="btn btn-primary mt-2 ms-2" href="#">
                     Print Test
                 </a>
