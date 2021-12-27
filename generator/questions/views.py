@@ -94,7 +94,8 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
             # Rank search
             vector = SearchVector('question', 'answers__answer')
             query = SearchQuery(q)
-            questions = questions.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.001).order_by('-rank')
+            questions = questions.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.001).order_by('-rank')\
+                .distinct()
 
     # Query search - tags
     tag_search_form = SearchTagForm()
