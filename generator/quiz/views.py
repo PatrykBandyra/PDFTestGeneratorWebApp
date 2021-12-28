@@ -206,7 +206,7 @@ def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
             try:
                 # Check if user is an author of a subject or an author of a quiz
                 question_id = int(request.POST.get('delete'))
-                if not is_author_of_quiz(request.user, question_id) and \
+                if not is_author_of_quiz(request.user, quiz_id) and \
                         not is_author_of_subject(request.user, subject_id):
                     raise Exception
 
@@ -219,7 +219,7 @@ def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
             quiz = get_object_or_404(Quiz, id=quiz_id)
 
             # Check rights to modify order
-            if not is_author_of_quiz(request.user, question_id) and \
+            if not is_author_of_quiz(request.user, quiz_id) and \
                     not is_author_of_subject(request.user, subject_id):
                 return redirect(reverse('quiz:quiz', args=[subject_id, subject_slug, quiz_id, quiz_slug]))
 
@@ -241,7 +241,7 @@ def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
             quiz = get_object_or_404(Quiz, id=quiz_id)
 
             # Check rights to modify order
-            if not is_author_of_quiz(request.user, question_id) and \
+            if not is_author_of_quiz(request.user, quiz_id) and \
                     not is_author_of_subject(request.user, subject_id):
                 return redirect(reverse('quiz:quiz', args=[subject_id, subject_slug, quiz_id, quiz_slug]))
 
@@ -290,7 +290,7 @@ def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
             # Rank search
             vector = SearchVector('question', 'answers__answer')
             query = SearchQuery(q)
-            questions = questions.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.001).order_by('-rank')\
+            questions = questions.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.001).order_by('-rank') \
                 .distinct()
 
     # Query search - tags
@@ -328,3 +328,108 @@ def quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
                                               'search_form': search_form,
                                               'tag_query': tag_query,
                                               'tag_search_form': tag_search_form})
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def add_question_to_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, tag_slug=None):
+    if request.method == 'POST':
+
+        question_id = request.POST.get('add')
+        if question_id:
+            try:
+                # Check if user is an author of a subject or an author of a quiz
+                question_id = int(request.POST.get('add'))
+                if not is_author_of_quiz(request.user, quiz_id) and \
+                        not is_author_of_subject(request.user, subject_id):
+                    raise Exception
+
+                quiz = get_object_or_404(Quiz, id=quiz_id)
+                question = get_object_or_404(Question, id=question_id)
+                qq = QuizQuestion.objects.filter(quiz=quiz).order_by('-order').first()
+                if qq:
+                    order = qq.order
+                else:  # First question in quiz
+                    order = 0
+                QuizQuestion.objects.create(quiz=quiz, question=question, order=order + 1)
+            except Exception:
+                pass
+
+        question_ids = request.POST.get('add_all')
+        if question_ids:
+            try:
+
+                # Check if user is an author of a subject or an author of a quiz
+                if not is_author_of_quiz(request.user, quiz_id) and \
+                        not is_author_of_subject(request.user, subject_id):
+                    raise Exception
+
+                quiz = get_object_or_404(Quiz, id=quiz_id)
+                question_ids = str(request.POST.get('add_all')).split(',')
+                for question_id in question_ids:
+                    question_id = int(question_id.strip())
+                    question = get_object_or_404(Question, id=question_id)
+                    qq = QuizQuestion.objects.filter(quiz=quiz).order_by('-order').first()
+                    if qq:
+                        order = qq.order
+                    else:
+                        order = 0
+                    QuizQuestion.objects.create(quiz=quiz, question=question, order=order + 1)
+
+            except Exception:
+                pass
+
+    # GET/POST
+    # Load all questions from a subject that are not already in a quiz
+    subject = get_object_or_404(Subject, id=subject_id)
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    questions = subject.questions.exclude(question_quizzes__quiz=quiz).all()
+
+    # Query search - questions and answers
+    search_form = SearchForm()
+    q = None
+    if 'query' in request.GET:
+        search_form = SearchForm(request.GET)
+        if search_form.is_valid():
+            q = search_form.cleaned_data['query']
+
+            # Rank search
+            vector = SearchVector('question', 'answers__answer')
+            query = SearchQuery(q)
+            questions = questions.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.001).order_by('-rank') \
+                .distinct()
+
+    # Query search - tags
+    tag_search_form = SearchTagForm()
+    tag_query = None
+    if 'tag_query' in request.GET:
+        tag_search_form = SearchTagForm(request.GET)
+        if tag_search_form.is_valid():
+            tag_query = tag_search_form.cleaned_data['tag_query']
+            # Trigram search
+            questions = questions.annotate(
+                similarity=TrigramSimilarity('tags__name', tag_query)
+            ).filter(similarity__gt=0.1).order_by('id', '-similarity').distinct('id')
+
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        questions = questions.filter(tags__in=[tag])
+
+    paginator = Paginator(questions, 10)
+    page = request.GET.get('page')
+    try:
+        questions_page = paginator.page(page)
+    except PageNotAnInteger:
+        # If page value is not int - get first page
+        questions_page = paginator.page(1)
+    except EmptyPage:
+        # If page value is bigger than the value of last page - get last page
+        questions_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'quiz/add_question_to_quiz.html', {'subject': subject, 'questions': questions_page,
+                                                              'tag': tag, 'query': q,
+                                                              'search_form': search_form,
+                                                              'tag_query': tag_query,
+                                                              'tag_search_form': tag_search_form,
+                                                              'quiz': quiz})

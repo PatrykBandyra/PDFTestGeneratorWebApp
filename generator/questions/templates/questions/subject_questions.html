@@ -8,7 +8,10 @@
     <section class="min-vh-100 gradient-custom container-fluid pb-5">
         <div class="d-flex justify-content-between position-relative top-0 start-0">
             <a class="btn btn-primary mt-2 ms-4" href="{% url 'account:dashboard' %}">Return to Subjects</a>
-            <a class="btn btn-success mt-2 me-4" href="{% url 'quiz:quizzes' subject.id subject.slug %}">Tests</a>
+            <div>
+                <a class="btn btn-primary mt-2 me-4" href="#">People</a>
+                <a class="btn btn-success mt-2 me-4" href="{% url 'quiz:quizzes' subject.id subject.slug %}">Tests</a>
+            </div>
         </div>
 
         <h1 class="text-light text-center pt-4">

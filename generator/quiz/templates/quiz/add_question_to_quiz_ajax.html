@@ -1,0 +1,64 @@
+{% for question in questions %}
+
+    <div class="accordion-item rounded mt-3">
+        <nav class="navbar navbar-light bg-transparent">
+
+            <div class="container-fluid d-flex justify-content-center mb-2">
+                <div>
+                    {% for tag in question.tags.all %}
+                        <a
+                                href="{% url 'quiz:add-question-to-quiz-by-tag' question.subject.id question.subject.slug quiz.id quiz.slug tag.slug %}"
+                                class="badge badge-primary mx-1">{{ tag.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="container-fluid">
+
+                <form method="post" class="form-inline text-center">
+                    {% csrf_token %}
+                    <button type="submit" name="add" value="{{ question.id }}"
+                            class="btn btn-success {% if quiz.author != user and subject.author != user %}disabled{% endif %}">
+                        Add to Test
+                    </button>
+                </form>
+
+            </div>
+        </nav>
+
+        <h2 class="accordion-header" id="heading{{ question.id }}">
+            <button class="accordion-button d-block collapsed" type="button" data-mdb-toggle="collapse"
+                    data-mdb-target="#panelsStayOpen-collapse{{ question.id }}">
+                {{ question.question|safe }}
+            </button>
+        </h2>
+        <div id="panelsStayOpen-collapse{{ question.id }}" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <div class="d-flex justify-content-center border-bottom border-dark mb-2">
+                    <h3 class="h3">Answers</h3>
+                </div>
+
+                {% for answer in question.answers.all %}
+                    {% if answer.is_right %}
+                        <div class="p-2 my-2" style="border: 3px green solid; border-radius: 15px">
+                            {{ answer.answer|safe }}
+                        </div>
+                    {% else %}
+                        <div class="p-2 my-2" style="border: 3px red solid; border-radius: 15px">
+                            {{ answer.answer|safe }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+{% empty %}
+
+    <div class="d-flex justify-content-center mt-5">
+        <h1 class="h1 text-danger">No questions</h1>
+    </div>
+
+{% endfor %}

@@ -64,7 +64,7 @@
                     <div class="card-body">
                         <h5 class="card-title text-center">Add Question to the Test</h5>
                         <p class="card-text text-center">
-                            <a href="#">
+                            <a href="{% url 'quiz:add-question-to-quiz' subject.id subject.slug quiz.id quiz.slug %}">
                                 <i class="fas fa-plus fa-5x mt-4"></i>
                             </a>
                         </p>

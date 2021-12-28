@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Add questions to {{ quiz.name }}
+{% endblock %}
+
+{% block content %}
+    <section class="min-vh-100 gradient-custom container-fluid pb-5">
+        <div class="d-flex justify-content-start position-relative top-0 start-0">
+            <a class="btn btn-primary mt-2 ms-4" href="{% url 'quiz:quiz' subject.id subject.slug quiz.id quiz.slug %}">
+                Return to Test
+            </a>
+        </div>
+
+        <h1 class="text-light text-center pt-4">
+            <a class="text-decoration-none text-light"
+               href="{% url 'quiz:add-question-to-quiz' subject.id subject.slug quiz.id quiz.slug %}">
+                Add questions from {{ subject.name }} <br>
+                to test {{ quiz.name }}
+            </a>
+        </h1>
+
+        <div class="container mx-auto px-auto">
+
+            <div class="accordion" id="accordionPanelsStayOpen">
+                {% if tag %}
+                    <div class="d-flex justify-content-center mb-3">
+                        <h2 class="h2 text-light">Questions with tag: <span class="text-danger">{{ tag.name }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-around mb-5">
+                    <form method="get" class="w-25 text-center">
+
+                        <div class="form-outline form-white mb-4">
+                            {{ search_form.query.errors }}
+                            {{ search_form.query }}
+                            <label class="form-label" for="query">Search in questions and answers</label>
+                        </div>
+
+                        <button type="submit" class="btn-outline-warning btn-rounded">Search</button>
+                    </form>
+
+                    <form method="get" class="w-25 text-center">
+
+                        <div class="form-outline form-white mb-4">
+                            {{ tag_search_form.tag_query.errors }}
+                            {{ tag_search_form.tag_query }}
+                            <label class="form-label" for="tag_query">Search in tags</label>
+                        </div>
+
+                        <button type="submit" class="btn-outline-warning btn-rounded">Search</button>
+                    </form>
+                </div>
+
+                {% if query %}
+                    <div class="d-flex justify-content-center">
+                        <h2 class="h2 text-light">Questions containing: <span
+                                class="text-danger">{{ query }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
+                {% if tag_query %}
+                    <div class="d-flex justify-content-center">
+                        <h2 class="h2 text-light">Questions with tags containing: <span
+                                class="text-danger">{{ tag_query }}</span>
+                        </h2>
+                    </div>
+                {% endif %}
+
+                <form method="post" class="form-inline text-center">
+                    {% csrf_token %}
+                    <button type="submit" name="add_all"
+                            value="{% for question in questions %}{{ question.id }}{% if not forloop.last %},{% endif %}{% endfor %}"
+                            class="btn btn-success {% if quiz.author != user and subject.author != user %}disabled{% endif %}">
+                        Add All ({{ questions|length }})
+                    </button>
+                </form>
+
+                <div id="question-list">
+                    {% include 'quiz/add_question_to_quiz_ajax.html' %}
+                </div>
+
+            </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center mt-5">
+            {% include 'questions/pagination.html' with page=questions %}
+        </div>
+
+        <div class="position-fixed bottom-0 end-0 mb-3 me-3" style="z-index: 9999">
+            <button type="button" class="btn btn-warning btn-floating btn-lg" id="scrollBtn" style="display: none">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+        </div>
+
+    </section>
+
+
+    <script>
+        let scrollBtn = document.getElementById("scrollBtn");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollBtn.style.display = "block";
+            } else {
+                scrollBtn.style.display = "none";
+            }
+        }
+
+        scrollBtn.addEventListener("click", topFunction);
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    </script>
+{% endblock %}
