@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ subject.name }} - people
+{% endblock %}
+
+{% block content %}
+    <section class="min-vh-100 gradient-custom container-fluid pb-5">
+        <div class="d-flex justify-content-between position-relative top-0 start-0">
+            <a class="btn btn-primary mt-2 ms-4" href="{% url 'questions:subject' subject.id subject.slug %}">
+                Return to Subject
+            </a>
+            <a class="btn btn-success mt-2 ms-4" href="{% url 'questions:subject-add-owner' subject.id subject.slug %}">
+                Add new Owner
+            </a>
+        </div>
+
+        <h1 class="text-light text-center pt-4">
+            <a class="text-decoration-none text-light"
+               href="{% url 'questions:subject-people' subject.id subject.slug %}">
+                {{ subject.name }} <br>
+                People
+            </a>
+        </h1>
+
+        <h3 class="h3 text-light text-center pt-4">
+            Author of Subject
+        </h3>
+
+        <div class="container mx-auto px-auto">
+            <div class="card bg-dark text-light">
+                <div class="card-body">
+                    <h5 class="card-title">{{ subject.author.username }} <span class="text-danger">(you)</span></h5>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="h3 text-light text-center pt-4">
+            Owners of Subject
+        </h3>
+
+        <div class="container mx-auto px-auto">
+            {% for owner in owners %}
+                <div class="card bg-dark text-light mt-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ owner.username }}</h5>
+                        <button type="button" data-mdb-toggle="modal"
+                                data-mdb-target="#delete{{ owner.id }}"
+                                class="btn btn-danger mt-2">
+                            Remove from Subject
+                        </button>
+                    </div>
+                </div>
+
+                {# Delete dialog #}
+                <div class="modal" tabindex="-1" role="dialog" id="delete{{ owner.id }}">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Remove Owner</h5>
+                                <button type="button" class="btn-close" data-mdb-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to remove {{ owner.username }} from {{ subject.name }}?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="delete" value="{{ owner.id }}">
+                                    <button type="submit" class="btn btn-danger">Yes, remove</button>
+                                </form>
+                                <button type="button" class="btn btn-success" data-mdb-dismiss="modal">
+                                    No, cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+
+        <div class="position-fixed bottom-0 end-0 mb-3 me-3" style="z-index: 9999">
+            <button type="button" class="btn btn-warning btn-floating btn-lg" id="scrollBtn" style="display: none">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+        </div>
+
+    </section>
+
+
+    <script>
+        let scrollBtn = document.getElementById("scrollBtn");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollBtn.style.display = "block";
+            } else {
+                scrollBtn.style.display = "none";
+            }
+        }
+
+        scrollBtn.addEventListener("click", topFunction);
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    </script>
+
+{% endblock %}

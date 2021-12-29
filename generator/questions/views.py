@@ -5,9 +5,11 @@ from django.contrib.postgres.search import TrigramSimilarity, SearchVector, Sear
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import transaction
 from django.http import HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.views.decorators.http import require_http_methods
 from taggit.models import Tag
+from django.contrib.auth.models import User
+from django.db.models.query import QuerySet
 
 from .forms import SubjectCreationForm, QuestionCreationForm, AnswerCreationForm, SearchForm, SearchTagForm
 from .models import Subject, Question, Answer
@@ -89,7 +91,7 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
             # Rank search
             vector = SearchVector('question', 'answers__answer')
             query = SearchQuery(q)
-            questions = questions.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.001).order_by('-rank')\
+            questions = questions.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.001).order_by('-rank') \
                 .distinct()
 
     # Query search - tags
@@ -237,7 +239,6 @@ def edit_question(request, subject_id, subject_slug, question_id):
                     if tag != '':
                         question_edited.tags.add(tag)
 
-
                 question_edited.save()
 
             return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
@@ -326,3 +327,75 @@ def edit_answer(request, subject_id, subject_slug, question_id, answer_id):
 
     else:
         redirect(get_object_or_404(Subject, id=subject_id).get_absolute_url())
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def people(request, subject_id, subject_slug):
+    subject = get_object_or_404(Subject, id=subject_id)
+    if not is_author_of_subject(request.user, subject.id):
+        return redirect(reverse('questions:subject', args=[subject_id, subject_slug]))
+
+    if request.method == 'POST':
+        # Remove owner from subject
+        try:
+            user_id = int(request.POST.get('delete'))
+
+            user_to_be_removed = get_object_or_404(User, id=user_id)
+            subject.ownership.remove(user_to_be_removed)
+        except ValueError:
+            pass
+
+    # Subject owners without author
+    owners = User.objects.filter(subjects__in=[subject]).exclude(id=subject.author.id).all()
+    return render(request, 'questions/people.html', {'subject': subject, 'owners': owners})
+
+
+@login_required
+@require_http_methods(['GET', 'POST'])
+def add_owner(request, subject_id, subject_slug):
+    subject = get_object_or_404(Subject, id=subject_id)
+
+    if not is_owner_of_subject(request.user, subject_id):
+        return redirect(reverse('questions:subject', args=[subject.id, subject.slug]))
+
+    if request.method == 'POST':
+        # Add user to subject
+        try:
+            user_id = int(request.POST.get('user_id'))
+
+            user_to_be_added = get_object_or_404(User, id=user_id)
+            subject.ownership.add(user_to_be_added)
+        except ValueError:
+            pass
+
+    # GET/POST
+    users = User.objects.none()
+
+    # Query search - usernames
+    search_form = SearchForm()
+    q = None
+    if 'query' in request.GET:
+        search_form = SearchForm(request.GET)
+        if search_form.is_valid():
+            q = search_form.cleaned_data['query']
+
+            # Trigram search
+            owner_ids = User.objects.filter(subjects__in=[subject]).all().values_list('id', flat=True)
+            users = User.objects.annotate(
+                similarity=TrigramSimilarity('username', q)
+            ).filter(similarity__gt=0.1).exclude(id__in=owner_ids).order_by('-similarity').all()
+
+    paginator = Paginator(users, 10)
+    page = request.GET.get('page')
+    try:
+        users_page = paginator.page(page)
+    except PageNotAnInteger:
+        # If page value is not int - get first page
+        users_page = paginator.page(1)
+    except EmptyPage:
+        # If page value is bigger than the value of last page - get last page
+        users_page = paginator.page(paginator.num_pages)
+
+    return render(request, 'questions/people_add.html', {'subject': subject, 'users': users_page,
+                                                         'query': q, 'search_form': search_form})

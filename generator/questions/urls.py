@@ -14,7 +14,9 @@ urlpatterns = [
     path('subject/<int:subject_id>/<slug:subject_slug>/add-question/', views.create_question, name='question-create'),
 
     # Subject
-    path('subject/<int:subject_id>/<slug:subject_slug>/edit', views.edit_subject, name='subject-edit'),
+    path('subject/<int:subject_id>/<slug:subject_slug>/edit/', views.edit_subject, name='subject-edit'),
+    path('subject/<int:subject_id>/<slug:subject_slug>/people/add/', views.add_owner, name='subject-add-owner'),
+    path('subject/<int:subject_id>/<slug:subject_slug>/people/', views.people, name='subject-people'),
     # List of questions in subject
     path('subject/<int:subject_id>/<slug:subject_slug>/tag/<slug:tag_slug>/', views.subject, name='subject-by-tag'),
     path('subject/<int:subject_id>/<slug:subject_slug>/', views.subject, name='subject'),

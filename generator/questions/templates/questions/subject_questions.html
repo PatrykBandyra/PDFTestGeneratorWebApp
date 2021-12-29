@@ -9,8 +9,8 @@
         <div class="d-flex justify-content-between position-relative top-0 start-0">
             <a class="btn btn-primary mt-2 ms-4" href="{% url 'account:dashboard' %}">Return to Subjects</a>
             <div>
-                <a class="btn btn-primary mt-2 me-4 {% if subject.author != request.user %}disabled{% endif %}"
-                   href="#">
+                <a class="btn btn-primary mt-2 me-4 {% if subject.author != user %}disabled{% endif %}"
+                   href="{% url 'questions:subject-people' subject.id subject.slug %}">
                     People
                 </a>
                 <a class="btn btn-success mt-2 me-4" href="{% url 'quiz:quizzes' subject.id subject.slug %}">Tests</a>

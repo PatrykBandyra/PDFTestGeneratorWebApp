@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ subject.name }} - add people
+{% endblock %}
+
+{% block content %}
+    <section class="min-vh-100 gradient-custom container-fluid pb-5">
+        <div class="d-flex justify-content-between position-relative top-0 start-0">
+            <a class="btn btn-primary mt-2 ms-4" href="{% url 'questions:subject-people' subject.id subject.slug %}">
+                Return to People
+            </a>
+        </div>
+
+        <h1 class="text-light text-center pt-4">
+            <a class="text-decoration-none text-light"
+               href="{% url 'questions:subject-add-owner' subject.id subject.slug %}">
+                {{ subject.name }} <br>
+                Add New Owner
+            </a>
+        </h1>
+
+        <div class="d-flex justify-content-around mb-5 mt-5">
+            <form method="get" class="w-25 text-center">
+
+                <div class="form-outline form-white mb-4">
+                    {{ search_form.query.errors }}
+                    {{ search_form.query }}
+                    <label class="form-label" for="query">Search in users</label>
+                </div>
+
+                <button type="submit" class="btn-outline-warning btn-rounded">Search</button>
+            </form>
+        </div>
+
+        <div class="container mx-auto px-auto">
+            {% for user in users %}
+                <div class="card bg-dark text-light">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ user.username }}</h5>
+                        <form method="post" class="form-inline">
+                            <input type="hidden" name="user_id" value="{{ user.id }}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Add to Subject</button>
+                        </form>
+                    </div>
+                </div>
+
+            {% empty %}
+                <h1 class="text-danger text-center pt-4">
+                    No results
+                </h1>
+            {% endfor %}
+        </div>
+
+
+        <div class="d-flex justify-content-center align-items-center mt-5">
+            {% include 'questions/pagination.html' with page=users %}
+        </div>
+
+        <div class="position-fixed bottom-0 end-0 mb-3 me-3" style="z-index: 9999">
+            <button type="button" class="btn btn-warning btn-floating btn-lg" id="scrollBtn" style="display: none">
+                <i class="fas fa-arrow-up"></i>
+            </button>
+        </div>
+
+    </section>
+
+
+    <script>
+        let scrollBtn = document.getElementById("scrollBtn");
+
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () {
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                scrollBtn.style.display = "block";
+            } else {
+                scrollBtn.style.display = "none";
+            }
+        }
+
+        scrollBtn.addEventListener("click", topFunction);
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+    </script>
+
+{% endblock %}
