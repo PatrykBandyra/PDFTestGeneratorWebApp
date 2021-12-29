@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity, SearchVector, SearchQuery, SearchRank
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import transaction
-from django.db.models.functions import Greatest
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
@@ -86,10 +85,6 @@ def subject(request, subject_id, subject_slug, tag_slug=None):
         search_form = SearchForm(request.GET)
         if search_form.is_valid():
             q = search_form.cleaned_data['query']
-            # # Trigram search
-            # questions = questions.annotate(
-            #     similarity=Greatest(TrigramSimilarity('question', query), TrigramSimilarity('answers__answer', query))
-            # ).filter(similarity__gt=0.1).order_by('-similarity')
 
             # Rank search
             vector = SearchVector('question', 'answers__answer')

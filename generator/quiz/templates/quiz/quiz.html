@@ -12,19 +12,22 @@
                 Return to Tests
             </a>
             <div>
-                <a class="btn btn-success mt-2"
+                <a class="btn btn-success mt-2 {% if quiz.author != request.user and quiz.subject.author != request.user %}disabled{% endif %}"
                    href="{% url 'quiz:edit-quiz' subject.id subject.slug quiz.id quiz.slug %}?ret={{ request.build_absolute_uri }}">
                     Edit Test
                 </a>
                 <button type="button" data-mdb-toggle="modal"
                         data-mdb-target="#delete{{ quiz.id }}"
-                        class="btn btn-danger mt-2 ms-2">
+                        class="btn btn-danger mt-2 ms-2 {% if quiz.author != request.user and quiz.subject.author != request.user %}disabled{% endif %}">
                     Delete Test
                 </button>
                 <form method="post" class="d-inline">
                     {% csrf_token %}
                     <input type="hidden" name="randomize" value="yes">
-                    <button type="submit" class="btn btn-primary mt-2 ms-2">Randomize Question Order</button>
+                    <button type="submit"
+                            class="btn btn-primary mt-2 ms-2 {% if quiz.author != request.user and quiz.subject.author != request.user %}disabled{% endif %}">
+                        Randomize Question Order
+                    </button>
                 </form>
                 <a class="btn btn-primary mt-2 ms-2" href="#">
                     Print Test
@@ -59,18 +62,22 @@
                 </p>
             {% endif %}
 
-            <div class="row my-3 row-cols-1 row-cols-md-2 pb-3">
-                <div class="card col-md-12 bg-dark text-light my-3 py-2">
-                    <div class="card-body">
-                        <h5 class="card-title text-center">Add Question to the Test</h5>
-                        <p class="card-text text-center">
-                            <a href="{% url 'quiz:add-question-to-quiz' subject.id subject.slug quiz.id quiz.slug %}">
-                                <i class="fas fa-plus fa-5x mt-4"></i>
-                            </a>
-                        </p>
+            {% if quiz.author == request.user or quiz.subject.author == request.user %}
+                <div class="row my-3 row-cols-1 row-cols-md-2 pb-3">
+                    <div class="card col-md-12 bg-dark text-light my-3 py-2">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">
+                                Add Question to the Test
+                            </h5>
+                            <p class="card-text text-center">
+                                <a href="{% url 'quiz:add-question-to-quiz' subject.id subject.slug quiz.id quiz.slug %}">
+                                    <i class="fas fa-plus fa-5x mt-4"></i>
+                                </a>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
 
             <div class="accordion" id="accordionPanelsStayOpen">
                 {% if tag %}
