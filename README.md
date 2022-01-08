@@ -24,7 +24,7 @@ Należy:
 - uruchomić bazę danych
 - przejść do katalogu domowego projektu i uruchomić polecenie:
 ```batch
-python .\generator\manage.py migrate
+python3 ./generator/manage.py migrate
 ```
 
 ### Uruchomienie:
@@ -32,6 +32,6 @@ python .\generator\manage.py migrate
 W celu uruchomienia aplikacji należy:
 - przejść do katalogu domowego projektu i uruchomić polecenie:
 ```batch
-python .\generator\manage.py runserver
+python3 ./generator/manage.py runserver
 ```
 - uruchomić przeglądarkę internetową i przejść pod adres http://localhost:8000/
