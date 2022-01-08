@@ -12,26 +12,43 @@
 - Andrzej Sawicki
 - Patryk Bandyra
 
-### Przed pierwszym uruchomieniem
+### Instalacja
 
 Należy:
 - zainstalować za pomocą instalatora pakietów, np. pip, pakiety wymienione w pliku requirements.txt
-- zainstalować na lokalnej maszynie bazę danych PostgreSQL
-- ustawić:
-    - nasłuch bazy danych na porcie 5432
-    - hasło administratora bazy danych na: postgres
-- zainstalować rozszerzenie do bazy danych o nazwie: pg_trgm
-- uruchomić bazę danych
-- przejść do katalogu domowego projektu i uruchomić polecenie:
 ```batch
-python3 ./generator/manage.py migrate
+pip install -r requirements.txt
 ```
+- zainstalować na lokalnej maszynie bazę danych PostgreSQL
+```batch
+sudo apt install postgresql postgresql-contrib
+```
+- utworzyć bazę danych oraz użytkownika
+```batch
+sudo -u postgres psql -c "CREATE DATABASE testgenerator"
+sudo -u postgres psql -c "CREATE USER testgenerator WITH PASSWORD 'testgenerator';"
+``` 
+- zainstalować rozszerzenie do bazy danych o nazwie *pg_trgm*
+```batch
+sudo -u postgres psql postgres -c "CREATE EXTENSION pg_trgm"
+``` 
+- zmigrować bazę danych za pomocą skryptu:
+```batch
+python3 generator/manage.py migrate
+```
+
+*Polecenia dostosowane do systemu Ubuntu 20.04 LTS*
 
 ### Uruchomienie:
 
-W celu uruchomienia aplikacji należy:
-- przejść do katalogu domowego projektu i uruchomić polecenie:
+Należy:
+- uruchomić lokalną usługę za pomocą skryptu:
 ```batch
-python3 ./generator/manage.py runserver
+python3 generator/manage.py runserver
 ```
-- uruchomić przeglądarkę internetową i przejść pod adres http://localhost:8000/
+- uruchomić przeglądarkę internetową i przejść pod adres http://127.0.0.1:8000/
+```batch
+firefox -new-tab "http://127.0.0.1:8000/"
+```
+
+*Polecenia dostosowane do systemu Ubuntu 20.04 LTS*
