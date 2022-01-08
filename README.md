@@ -23,10 +23,11 @@ pip install -r requirements.txt
 ```batch
 sudo apt install postgresql postgresql-contrib
 ```
-- utworzyć bazę danych oraz użytkownika
+- utworzyć bazę danych, użytkownika oraz uprawnienia
 ```batch
 sudo -u postgres psql -c "CREATE DATABASE testgenerator"
 sudo -u postgres psql -c "CREATE USER testgenerator WITH PASSWORD 'testgenerator';"
+sudo -u postgres psql -c "ALTER USER testgenerator CREATEDB;"
 ``` 
 - zainstalować rozszerzenie do bazy danych o nazwie *pg_trgm*
 ```batch

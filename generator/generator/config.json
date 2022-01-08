@@ -1,0 +1,10 @@
+{
+  "SECRET_KEY": "1$c3eh+k*g6ufo^&gi%4ehgx0v47!)_2373(tzydz8van5sp#3",
+  "EMAIL_HOST_USER": "testgenerator",
+  "EMAIL_HOST_PASSWORD": "testgenerator",
+  "RECAPTCHA_PRIVATE_KEY": "6LeoyA0dAAAAACppeEuxOFn-MS3VZAflGTb9GGOt",
+  "RECAPTCHA_PUBLIC_KEY": "6LeoyA0dAAAAAONc1zxEUwvMJrc4e2Q5dZZAJ3Dp",
+  "DB_NAME": "testgenerator",
+  "DB_USER": "testgenerator",
+  "DB_PASSWORD": "testgenerator"
+}
