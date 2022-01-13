@@ -269,12 +269,12 @@ def add_answer(request, subject_id, subject_slug, question_id):
                 if is_answer_unique_constraint_fulfilled(question, answer_form.cleaned_data['order']):
                     new_answer.save()
                     return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
-                else:
-                    # Return error to a template
-                    answer_form.add_error('order', 'Choose other ordinal number. '
-                                                   'This one has been already assigned to a different answer of this '
-                                                   'question.')
-                    return render(request, 'questions/question_add_answer.html', {'answer_form': answer_form})
+                # else:
+                #     # Return error to a template
+                #     answer_form.add_error('order', 'Choose other ordinal number. '
+                #                                    'This one has been already assigned to a different answer of this '
+                #                                    'question.')
+                #     return render(request, 'questions/question_add_answer.html', {'answer_form': answer_form})
 
         else:  # GET
             # Default value of order - next int
