@@ -106,7 +106,7 @@ class SubjectModelTests(TestCase):
 
     def test_get_absolute_url(self):
         subject = Subject.objects.create(name='PPP', author=self.user)
-        expected_url = reverse('questions:subject', args=[self.user.id, slugify(subject.name)])
+        expected_url = reverse('questions:subject', args=[subject.id, slugify(subject.name)])
         self.assertEqual(expected_url, subject.get_absolute_url())
 
 

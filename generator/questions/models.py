@@ -31,6 +31,9 @@ class Subject(models.Model):
     def get_absolute_url(self):
         return reverse('questions:subject', args=[self.id, self.slug])
 
+    class Meta:
+        unique_together = ('name', 'author',)
+
 
 class Question(models.Model):
     question = RichTextField(max_length=5000)
