@@ -149,3 +149,32 @@ class AnswerModelTest(TestCase):
     def test_get_str(self):
         answer = Answer.objects.create(answer='PPP', question=self.question, order=1)
         self.assertEqual(answer.__str__(), f'ID: {answer.id}, QUESTION ID: {self.question.id}')
+
+class UtilsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Sets up data for the whole TestCase
+        """
+        cls.user = User.objects.create_user('Name')
+        cls.subject = Subject.objects.create(name='PPP', author=cls.user)
+        cls.question = Question.objects.create(question='PPP', subject=cls.subject, author=cls.user)
+        cls.answer = Answer.objects.create(answer='PPP', question=cls.question, order=1)
+
+    def test_author_of_subject(self):
+        user2 = User.objects.create_user('Name2')
+        self.subject.ownership.add(self.user, user2)
+        self.assertTrue(is_author_of_subject(self.user, self.subject.id))
+        self.assertFalse(is_author_of_subject(user2, self.subject.id))
+
+    def test_owner_of_subject(self):
+        user2 = User.objects.create_user('Name2')
+        self.subject.ownership.add(self.user, user2)
+        self.assertTrue(is_owner_of_subject(self.user, self.subject.id))
+        self.assertTrue(is_owner_of_subject(user2, self.subject.id))
+
+    def test_author_of_question(self):
+        self.assertTrue(is_author_of_question(self.user, self.question.id))
+
+    def test_answer_unique_constraint_fulfilled(self):
+        self.assertFalse(is_answer_unique_constraint_fulfilled(self.question.id, 1))
