@@ -4,7 +4,9 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.urls import reverse
-from .models import Subject
+
+from .models import Subject, Question, Answer
+from .utils import *
 
 
 class SubjectModelTests(TestCase):
@@ -109,8 +111,41 @@ class SubjectModelTests(TestCase):
         expected_url = reverse('questions:subject', args=[subject.id, slugify(subject.name)])
         self.assertEqual(expected_url, subject.get_absolute_url())
 
+    def test_get_str(self):
+        subject_name = 'PPP'
+        subject = Subject.objects.create(name=subject_name, author=self.user)
+        self.assertEqual(subject.__str__(), subject_name)
+
 
 class QuestionModelTest(TestCase):
-    def __init__(self):
-        pass
 
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Sets up data for the whole TestCase
+        """
+        cls.user = User.objects.create_user('Name')
+        cls.subject = Subject.objects.create(name='PPP', author=cls.user)
+
+    def test_get_str(self):
+        question = Question.objects.create(question='PPP', subject=self.subject, author=self.user)
+        self.assertEqual(question.__str__(), f'ID: {question.id}, AUTHOR: {self.user.username}')
+
+    def test_get_absolute_url(self):
+        question = Question.objects.create(question='PPP', subject=self.subject, author=self.user)
+        expected_url = reverse('questions:question', args=[self.subject.id, slugify(question.question), question.id])
+        self.assertEqual(expected_url, question.get_absolute_url())
+
+class AnswerModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Sets up data for the whole TestCase
+        """
+        cls.user = User.objects.create_user('Name')
+        cls.subject = Subject.objects.create(name='PPP', author=cls.user)
+        cls.question = Question.objects.create(question='PPP', subject=cls.subject, author=cls.user)
+
+    def test_get_str(self):
+        answer = Answer.objects.create(answer='PPP', question=self.question, order=1)
+        self.assertEqual(answer.__str__(), f'ID: {answer.id}, QUESTION ID: {self.question.id}')
