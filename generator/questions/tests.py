@@ -1,12 +1,13 @@
 from django.db.utils import IntegrityError
 
-from django.test import TestCase
+from django.test import TestCase, Client, RequestFactory
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from django.urls import reverse
 
 from .models import Subject, Question, Answer
 from .utils import *
+from .views import *
 
 
 class SubjectModelTests(TestCase):
@@ -178,3 +179,123 @@ class UtilsTest(TestCase):
 
     def test_answer_unique_constraint_fulfilled(self):
         self.assertFalse(is_answer_unique_constraint_fulfilled(self.question.id, 1))
+
+
+class SubjectViewsTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Sets up data for the whole TestCase
+        """
+        cls.user = User.objects.create_user('Name')
+        cls.user2 = User.objects.create_user('Name2')
+        cls.factory = RequestFactory()
+
+    def test_create_subject_get_form(self):
+        request = self.factory.get(reverse("questions:subject-create"))
+        request.user = self.user
+        response = create_subject(request)
+        self.assertEqual(response.status_code, 200)
+        
+
+    def test_create_subject_add_subject(self):
+        request = self.factory.post(reverse("questions:subject-create"), data={"name": "PPP", "description": "BBB"})
+        request.user = self.user
+        response = create_subject(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Subject.objects.all().first().author, self.user)
+
+    def test_edit_subject_not_author(self):
+        subject = Subject.objects.create(name='PPP', author=self.user)
+        request = self.factory.post(reverse("questions:subject-edit", args=[subject.id, slugify(subject.name)]), data={"name": "RRR", "description": "CCC"})
+        request.user = self.user2
+        response = edit_subject(request, subject.id, slugify(subject.name))
+        self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(Subject.objects.all().first().name, 'RRR')
+
+    def test_edit_subject_author_edit(self):
+        subject = Subject.objects.create(name='PPP', author=self.user)
+        request = self.factory.post(reverse("questions:subject-edit", args=[subject.id, slugify(subject.name)]), data={"name": "RRR", "description": "CCC"})
+        request.user = self.user
+        response = edit_subject(request, subject.id, slugify(subject.name))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Subject.objects.all().first().name, 'RRR')
+
+    def test_edit_subject_author_get_form(self):
+        subject = Subject.objects.create(name='PPP', author=self.user)
+        request = self.factory.get(reverse("questions:subject-edit", args=[subject.id, slugify(subject.name)]))
+        request.user = self.user
+        response = edit_subject(request, subject.id, slugify(subject.name))
+        self.assertEqual(response.status_code, 200)
+
+    def test_subject_delete_questions(self):
+        subjects = Subject.objects.create(name='PPP', author=self.user)
+        question = Question.objects.create(question='PPP', subject=subjects, author=self.user)
+        request = self.factory.post(reverse("questions:subject", args=[subjects.id, slugify(subjects.name)]), data={"delete": question.id})
+        request.user = self.user
+        response = subject(request, subjects.id, slugify(subjects.name))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Question.objects.all().first(), None)
+
+    def test_subject_delete_questions_exception(self):
+        subjects = Subject.objects.create(name='PPP', author=self.user)
+        question = Question.objects.create(question='PPP', subject=subjects, author=self.user)
+        request = self.factory.post(reverse("questions:subject", args=[subjects.id, slugify(subjects.name)]), data={"delete": "not a number"})
+        request.user = self.user
+        response = subject(request, subjects.id, slugify(subjects.name))
+        self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(Question.objects.all().first(), None)
+
+    def test_subject_delete_questions_exception_bad_user(self):
+        subjects = Subject.objects.create(name='PPP', author=self.user)
+        question = Question.objects.create(question='PPP', subject=subjects, author=self.user)
+        request = self.factory.post(reverse("questions:subject", args=[subjects.id, slugify(subjects.name)]), data={"delete": question.id})
+        request.user = self.user2
+        response = subject(request, subjects.id, slugify(subjects.name))
+        self.assertEqual(response.status_code, 302)
+        self.assertNotEqual(Question.objects.all().first(), None)
+
+    def test_subject_search_query(self):
+        subjects = Subject.objects.create(name='PPP', author=self.user)
+        subjects.ownership.add(self.user)
+        question = Question.objects.create(question='PPP', subject=subjects, author=self.user)
+        request = self.factory.get(reverse("questions:subject", args=[subjects.id, slugify(subjects.name)]), data={'query': 'query'})
+        request.user = self.user
+        response = subject(request, subjects.id, slugify(subjects.name))
+        self.assertEqual(response.status_code, 200)
+
+    def test_subject_search_tag(self):
+        subjects = Subject.objects.create(name='PPP', author=self.user)
+        subjects.ownership.add(self.user)
+        question = Question.objects.create(question='PPP', subject=subjects, author=self.user)
+        request = self.factory.get(reverse("questions:subject", args=[subjects.id, slugify(subjects.name)]), data={'tag_query': 'tag'})
+        request.user = self.user
+        
+        response = subject(request, subjects.id, slugify(subjects.name))
+        self.assertEqual(response.status_code, 200)
+
+class QuestionViewsTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Sets up data for the whole TestCase
+        """
+        cls.user = User.objects.create_user('Name')
+        cls.user2 = User.objects.create_user('Name2')
+        cls.subject = Subject.objects.create(name='PPP', author=cls.user)
+        cls.factory = RequestFactory()
+
+    def test_create_question_get_form(self):
+        request = self.factory.get(reverse("questions:question-create", args=[self.subject.id, slugify(self.subject.name)]))
+        request.user = self.user
+        response = create_question(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 200)
+
+    def test_create_question_add_question(self):
+        request = self.factory.post(reverse("questions:question-create", args=[self.subject.id, slugify(self.subject.name)]), data={"question": "PPP"})
+        request.user = self.user
+        response = create_question(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Question.objects.all().first().author, self.user)
