@@ -433,3 +433,9 @@ def add_question_to_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, 
                                                               'tag_query': tag_query,
                                                               'tag_search_form': tag_search_form,
                                                               'quiz': quiz})
+
+
+@login_required
+@require_http_methods(['GET'])
+def quiz_pdf(request):
+    return None
