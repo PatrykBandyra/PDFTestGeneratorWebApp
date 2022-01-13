@@ -28,10 +28,11 @@ sudo apt install postgresql postgresql-contrib
 sudo -u postgres psql -c "CREATE DATABASE testgenerator"
 sudo -u postgres psql -c "CREATE USER testgenerator WITH PASSWORD 'testgenerator';"
 sudo -u postgres psql -c "ALTER USER testgenerator CREATEDB;"
+sudo -u postgres psql -c "ALTER ROLE testgenerator SUPERUSER;"
 ``` 
 - zainstalować rozszerzenie do bazy danych o nazwie *pg_trgm*
 ```batch
-sudo -u postgres psql postgres -c "CREATE EXTENSION pg_trgm"
+sudo -u postgres psql testgenerator -c "CREATE EXTENSION pg_trgm"
 ``` 
 - zmigrować bazę danych za pomocą skryptu:
 ```batch
