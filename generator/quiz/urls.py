@@ -14,6 +14,8 @@ urlpatterns = [
          views.add_question_to_quiz, name='add-question-to-quiz'),
     path('subject/<int:subject_id>/<slug:subject_slug>/tests/<int:quiz_id>/<slug:quiz_slug>/',
          views.quiz, name='quiz'),
+    path('subject/<int:subject_id>/<slug:subject_slug>/tests/<int:quiz_id>/<slug:quiz_slug>/pdf/',
+         views.quiz_pdf, name='quiz-pdf'),
     path('subject/<int:subject_id>/<slug:subject_slug>/tests/tag/<slug:tag_slug>/', views.quizzes, name='quiz-by-tag'),
     path('subject/<int:subject_id>/<slug:subject_slug>/tests/', views.quizzes, name='quizzes'),
 ]

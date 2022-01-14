@@ -1,21 +1,27 @@
-import re
 import random
-from django.shortcuts import render, get_object_or_404, redirect
+import re
+import tempfile
+
+import weasyprint
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
+from django.contrib.postgres.search import TrigramSimilarity, SearchQuery, SearchVector, SearchRank
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib.postgres.search import TrigramSimilarity, SearchHeadline, SearchQuery, SearchVector, SearchRank
-from django.db.models.functions import Greatest
 from django.db import transaction
+from django.db.models.functions import Greatest
+from django.http import HttpResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.urls import reverse
-from questions.models import Subject, Question
+from django.views.decorators.http import require_http_methods
 from taggit.models import Tag
-from django.db.models.query import QuerySet
-from .forms import QuizCreationForm
-from .utils import is_author_of_quiz
-from .models import Quiz, QuizQuestion
-from questions.utils import is_author_of_subject
+
 from questions.forms import SearchForm, SearchTagForm
+from questions.models import Subject, Question
+from questions.utils import is_author_of_subject
+from .forms import QuizCreationForm
+from .models import Quiz, QuizQuestion
+from .utils import is_author_of_quiz
 
 
 @login_required
@@ -433,3 +439,21 @@ def add_question_to_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, 
                                                               'tag_query': tag_query,
                                                               'tag_search_form': tag_search_form,
                                                               'quiz': quiz})
+
+
+@login_required
+@require_http_methods(['GET'])
+def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
+    quiz = get_object_or_404(Quiz, id=quiz_id)
+    quiz_questions = quiz.quiz_questions.order_by('-order').all()
+    questions_ids = [quiz_question.question.id for quiz_question in quiz_questions]
+    questions = Question.objects.filter(id__in=questions_ids).order_by('question_quizzes__order').all()
+
+    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, 'questions': questions})
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'filename_{quiz_slug}.pdf'
+    weasyprint.HTML(string=html).write_pdf(response, stylesheets=[
+        weasyprint.CSS(settings.STATIC_ROOT + 'quiz/css/pdf.css')
+    ])
+
+    return response
