@@ -308,13 +308,13 @@ def edit_answer(request, subject_id, subject_slug, question_id, answer_id):
                     answer_edited.order = answer_form.cleaned_data['order']
                     answer_edited.save()
                     return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
-                else:
-                    # Return error to a template
-                    answer_form.add_error('order', 'Choose other ordinal number. '
-                                                   'This one has been already assigned to a different answer of this '
-                                                   'question.')
-                    return render(request, 'questions/question_edit_answer.html', {'answer_form': answer_form,
-                                                                                   'question': question})
+                # else:
+                #     # Return error to a template
+                #     answer_form.add_error('order', 'Choose other ordinal number. '
+                #                                    'This one has been already assigned to a different answer of this '
+                #                                    'question.')
+                #     return render(request, 'questions/question_edit_answer.html', {'answer_form': answer_form,
+                #                                                                    'question': question})
 
         else:  # GET
             question = get_object_or_404(Question, id=question_id)
