@@ -265,6 +265,15 @@ class SubjectViewsTest(TestCase):
         response = subject(request, subjects.id, slugify(subjects.name))
         self.assertEqual(response.status_code, 200)
 
+    def test_subject_search_query_ajax(self):
+        subjects = Subject.objects.create(name='PPP', author=self.user)
+        subjects.ownership.add(self.user)
+        question = Question.objects.create(question='PPP', subject=subjects, author=self.user)
+        request = self.factory.get(reverse("questions:subject", args=[subjects.id, slugify(subjects.name)]), HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'query': 'query'})
+        request.user = self.user
+        response = subject(request, subjects.id, slugify(subjects.name))
+        self.assertEqual(response.status_code, 200)
+
     def test_subject_search_tag(self):
         subjects = Subject.objects.create(name='PPP', author=self.user)
         subjects.ownership.add(self.user)
@@ -274,6 +283,42 @@ class SubjectViewsTest(TestCase):
         
         response = subject(request, subjects.id, slugify(subjects.name))
         self.assertEqual(response.status_code, 200)
+
+    def test_subject_search_query_empty_page(self):
+        subjects = Subject.objects.create(name='PPP', author=self.user)
+        subjects.ownership.add(self.user)
+        question = Question.objects.create(question='PPP', subject=subjects, author=self.user)
+        request = self.factory.get(reverse("questions:subject", args=[subjects.id, slugify(subjects.name)]), data={'query': 'query', 'page': 3})
+        request.user = self.user
+        response = subject(request, subjects.id, slugify(subjects.name))
+        self.assertEqual(response.status_code, 200)
+
+    def test_subject_search_query_empty_page_ajax(self):
+        subjects = Subject.objects.create(name='PPP', author=self.user)
+        subjects.ownership.add(self.user)
+        question = Question.objects.create(question='PPP', subject=subjects, author=self.user)
+        request = self.factory.get(reverse("questions:subject", args=[subjects.id, slugify(subjects.name)]), HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'query': 'query', 'page': 3})
+        request.user = self.user
+        response = subject(request, subjects.id, slugify(subjects.name))
+        self.assertEqual(response.status_code, 200)
+
+    def test_subject_search_query_tag(self):
+        subjects = Subject.objects.create(name='PPP', author=self.user)
+        subjects.ownership.add(self.user)
+
+        request = self.factory.post(reverse("questions:question-create", args=[subjects.id, slugify(subjects.name)]), data={"question": "PPP", 'tags': 'blah'})
+        request.user = self.user
+        response = create_question(request, subjects.id, slugify(subjects.name))
+        question = Question.objects.all().first()
+        
+        
+        question = Question.objects.create(question='PPP', subject=subjects, author=self.user)
+        request = self.factory.get(reverse("questions:subject", args=[subjects.id, slugify(subjects.name)]), data={'query': 'query'})
+        request.user = self.user
+        response = subject(request, subjects.id, slugify(question.tags), slugify('blah'))
+        self.assertEqual(response.status_code, 200)
+
+        
 
 class QuestionViewsTest(TestCase):
 
@@ -285,6 +330,9 @@ class QuestionViewsTest(TestCase):
         cls.user = User.objects.create_user('Name')
         cls.user2 = User.objects.create_user('Name2')
         cls.subject = Subject.objects.create(name='PPP', author=cls.user)
+        cls.question = Question.objects.create(question='QQQ', author=cls.user, subject=cls.subject)
+        cls.answer = Answer.objects.create(question=cls.question, order=1)
+        cls.answer2 = Answer.objects.create(question=cls.question, order=2)
         cls.factory = RequestFactory()
 
     def test_create_question_get_form(self):
@@ -299,3 +347,232 @@ class QuestionViewsTest(TestCase):
         response = create_question(request, self.subject.id, slugify(self.subject.name))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Question.objects.all().first().author, self.user)
+
+    def test_edit_question_get_form(self):
+        request = self.factory.get(reverse("questions:question-edit", args=[self.subject.id, slugify(self.subject.name), self.question.id]))
+        request.user = self.user
+        response = edit_question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_edit_question_get_not_author(self):
+        request = self.factory.get(reverse("questions:question-edit", args=[self.subject.id, slugify(self.subject.name), self.question.id]))
+        request.user = self.user2
+        response = edit_question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+
+    def test_edit_question(self):
+        request = self.factory.post(reverse("questions:question-create", args=[self.subject.id, slugify(self.subject.name)]), data={"question": "PPP", 'tags': 'blah'})
+        request.user = self.user
+        response = create_question(request, self.subject.id, slugify(self.subject.name))
+        question2 = Question.objects.all().first()
+
+        new_question = 'QQQQ'
+        request = self.factory.post(reverse("questions:question-edit", args=[self.subject.id, slugify(self.subject.name), question2.id]), data={'question': new_question, 'tags': 'blah2'})
+        request.user = self.user
+        response = edit_question(request, self.subject.id, slugify(self.subject.name), question2.id)
+        self.assertEqual(Question.objects.all().first().question, new_question)
+
+    def test_question_not_author(self):
+        request = self.factory.get(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]))
+        request.user = self.user2
+        response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+
+    def test_question_get_form(self):
+        request = self.factory.get(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]))
+        request.user = self.user
+        response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_question_delete_question(self):
+        request = self.factory.post(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]), data={'delete-question': self.question.id})
+        request.user = self.user
+        response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Question.objects.all().first(), None)
+
+    def test_question_delete_question_bad_id(self):
+        request = self.factory.post(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]), data={'delete-question': "not a number"})
+        request.user = self.user
+        response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Question.objects.all().first(), self.question)
+
+    def test_question_delete_question_answers(self):
+        request = self.factory.post(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]), data={'delete-answer': self.answer.id})
+        request.user = self.user
+        response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Answer.objects.all().first(), self.answer2)
+
+    def test_question_delete_question_answers_bad_id(self):
+        request = self.factory.post(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]), data={'delete-answer': "not a number"})
+        request.user = self.user
+        response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Answer.objects.all().first(), self.answer)
+
+    def test_question_move_answer_up(self):
+        request = self.factory.post(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]), data={'up': self.answer2.id})
+        request.user = self.user
+        response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Answer.objects.filter(id=self.answer2.id).get().order, 1)
+        self.assertEqual(Answer.objects.filter(id=self.answer.id).get().order, 2)
+
+    def test_question_move_answer_up_highest(self):
+        request = self.factory.post(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]), data={'up': self.answer.id})
+        request.user = self.user
+        exception = False
+        try:
+            response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        except:
+            exception = True
+        self.assertTrue(exception)
+
+    def test_question_move_answer_down(self):
+        request = self.factory.post(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]), data={'down': self.answer.id})
+        request.user = self.user
+        response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Answer.objects.filter(id=self.answer2.id).get().order, 1)
+        self.assertEqual(Answer.objects.filter(id=self.answer.id).get().order, 2)
+
+    def test_question_move_answer_down_lowest(self):
+        request = self.factory.post(reverse("questions:question", args=[self.subject.id, slugify(self.subject.name), self.question.id]), data={'down': self.answer2.id})
+        request.user = self.user
+        exception = False
+        try:
+            response = question(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        except:
+            exception = True
+        self.assertTrue(exception)
+
+    
+class AnswerViewsTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Sets up data for the whole TestCase
+        """
+        cls.user = User.objects.create_user('Name')
+        cls.user2 = User.objects.create_user('Name2')
+        cls.subject = Subject.objects.create(name='PPP', author=cls.user)
+        cls.question = Question.objects.create(question='QQQ', author=cls.user, subject=cls.subject)
+        cls.answer = Answer.objects.create(question=cls.question, order=1)
+        cls.answer2 = Answer.objects.create(question=cls.question, order=2)
+        cls.factory = RequestFactory()
+
+    def test_answer_add_not_author(self):
+        request = self.factory.get(reverse("questions:question-add-answer", args=[self.subject.id, slugify(self.subject.name), self.question.id]))
+        request.user = self.user2
+        response = add_answer(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+    
+    def test_answer_add_get_form(self):
+        request = self.factory.get(reverse("questions:question-add-answer", args=[self.subject.id, slugify(self.subject.name), self.question.id]))
+        request.user = self.user
+        response = add_answer(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_answer_add_get_form_no_answers_yet(self):
+        question2 = Question.objects.create(question='QQQ', author=self.user, subject=self.subject)
+        request = self.factory.get(reverse("questions:question-add-answer", args=[self.subject.id, slugify(self.subject.name), question2.id]))
+        request.user = self.user
+        response = add_answer(request, self.subject.id, slugify(self.subject.name), question2.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_answer_add_new(self):
+        request = self.factory.post(reverse("questions:question-add-answer", args=[self.subject.id, slugify(self.subject.name), self.question.id]), data={'answer': 'a', 'question': self.question, 'order': 3})
+        request.user = self.user
+        response = add_answer(request, self.subject.id, slugify(self.subject.name), self.question.id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Answer.objects.filter(order=3).get().question, self.question)
+
+    def test_answer_edit_not_author(self):
+        request = self.factory.get(reverse("questions:question-edit-answer", args=[self.subject.id, slugify(self.subject.name), self.question.id, self.answer.id]))
+        request.user = self.user2
+        response = edit_answer(request, self.subject.id, slugify(self.subject.name), self.question.id, self.answer.id)
+        self.assertEqual(response.status_code, 302)
+
+    def test_answer_edit_get_form(self):
+        request = self.factory.get(reverse("questions:question-edit-answer", args=[self.subject.id, slugify(self.subject.name), self.question.id, self.answer.id]))
+        request.user = self.user
+        response = edit_answer(request, self.subject.id, slugify(self.subject.name), self.question.id, self.answer.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_answer_edit_answer(self):
+        request = self.factory.post(reverse("questions:question-edit-answer", args=[self.subject.id, slugify(self.subject.name), self.question.id, self.answer.id]), data={'answer': 'nowy tekst', 'question': self.question, 'order': 3})
+        request.user = self.user
+        response = edit_answer(request, self.subject.id, slugify(self.subject.name), self.question.id, self.answer.id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Answer.objects.filter(order=3).get().answer, 'nowy tekst')
+
+
+class AdditionalViewsTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        """
+        Sets up data for the whole TestCase
+        """
+        cls.user = User.objects.create_user('Name')
+        cls.user2 = User.objects.create_user('Name2')
+        cls.subject = Subject.objects.create(name='PPP', author=cls.user)
+        cls.subject.ownership.add(cls.user)
+        cls.question = Question.objects.create(question='QQQ', author=cls.user, subject=cls.subject)
+        cls.answer = Answer.objects.create(question=cls.question, order=1)
+        cls.answer2 = Answer.objects.create(question=cls.question, order=2)
+        cls.factory = RequestFactory()
+
+    def test_people_remove_ownership(self):
+        request = self.factory.post(reverse("questions:subject-people", args=[self.subject.id, slugify(self.subject.name)]), data={'delete': self.user.id})
+        request.user = self.user
+        response = people(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(is_owner_of_subject(self.user, self.subject.id))
+
+    def test_people_not_author(self):
+        request = self.factory.post(reverse("questions:subject-people", args=[self.subject.id, slugify(self.subject.name)]), data={'delete': self.user.id})
+        request.user = self.user2
+        response = people(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 302)
+
+    def test_people_remove_ownership_bad_id(self):
+        request = self.factory.post(reverse("questions:subject-people", args=[self.subject.id, slugify(self.subject.name)]), data={'delete': "not a number"})
+        request.user = self.user
+        response = people(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(is_owner_of_subject(self.user, self.subject.id))
+
+    def test_people_add_ownership(self):
+        request = self.factory.post(reverse("questions:subject-add-owner", args=[self.subject.id, slugify(self.subject.name)]), data={'user_id': self.user.id})
+        request.user = self.user
+        response = add_owner(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(is_owner_of_subject(self.user, self.subject.id))
+
+    def test_people_add_ownership_not_author(self):
+        request = self.factory.post(reverse("questions:subject-add-owner", args=[self.subject.id, slugify(self.subject.name)]), data={'user_id': self.user.id})
+        request.user = self.user2
+        response = add_owner(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 302)
+
+    def test_people_add_ownership_bad_id(self):
+        request = self.factory.post(reverse("questions:subject-add-owner", args=[self.subject.id, slugify(self.subject.name)]), data={'user_id': "not a number"})
+        request.user = self.user
+        response = add_owner(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 200)
+
+    def test_people_add_ownership_with_query(self):
+        request = self.factory.get(reverse("questions:subject-add-owner", args=[self.subject.id, slugify(self.subject.name)]), data={'query': 'query'})
+        request.user = self.user
+        response = add_owner(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 200)
+
+    def test_people_add_ownership_with_query_empty_page(self):
+        request = self.factory.get(reverse("questions:subject-add-owner", args=[self.subject.id, slugify(self.subject.name)]), data={'query': 'query', 'page': 3})
+        request.user = self.user
+        response = add_owner(request, self.subject.id, slugify(self.subject.name))
+        self.assertEqual(response.status_code, 200)
