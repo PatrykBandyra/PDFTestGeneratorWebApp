@@ -326,7 +326,7 @@ def edit_answer(request, subject_id, subject_slug, question_id, answer_id):
                                                                            'question': question})
 
     else:
-        redirect(get_object_or_404(Subject, id=subject_id).get_absolute_url())
+        return redirect(get_object_or_404(Subject, id=subject_id).get_absolute_url())
 
 
 @login_required
