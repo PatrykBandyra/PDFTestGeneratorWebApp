@@ -1,7 +1,9 @@
 <h3>{{ quiz.subject.name }}</h3>
 <h3>{{ quiz.name }}</h3>
 
-{% for question in questions %}
-    <h5>{{ forloop.counter }}</h5>
-    <p>{{ question.question }}</p>
-{% endfor %}
+{% for question, answer in answers.items %}
+<h5>{{ forloop.counter }}</h5>
+<p>{{ question.question }}</p>
+{% for a in answer %}
+<p>{{a.answer}}</p>
+{% endfor %} {% endfor %}

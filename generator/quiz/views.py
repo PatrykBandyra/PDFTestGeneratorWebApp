@@ -15,6 +15,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from taggit.models import Tag
+from questions.models import Answer
 
 from questions.forms import SearchForm, SearchTagForm
 from questions.models import Subject, Question
@@ -448,8 +449,12 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     quiz_questions = quiz.quiz_questions.order_by('-order').all()
     questions_ids = [quiz_question.question.id for quiz_question in quiz_questions]
     questions = Question.objects.filter(id__in=questions_ids).order_by('question_quizzes__order').all()
-
-    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, 'questions': questions})
+    answers = {}
+    for question in questions:
+        answers[question] = Answer.objects.filter(question__id=question.id).all()
+    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, 'questions': questions, "answers":answers})
+    html = html.replace("&lt;p&gt;", "")
+    html = html.replace("&lt;/p&gt;", "")
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'filename_{quiz_slug}.pdf'
     weasyprint.HTML(string=html).write_pdf(response, stylesheets=[
