@@ -141,7 +141,7 @@ def create_quiz(request, subject_id, subject_slug):
 @require_http_methods(['GET', 'POST'])
 def edit_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug):
     # Check if user is an author of a quiz or an author of a subject
-    if not is_author_of_quiz(request.user, quiz_id) and not is_author_of_subject(request.user, subject_id):
+    if not is_author_of_quiz(request.user, quiz_id) or not is_author_of_subject(request.user, subject_id):
         # Just redirect - do not inform about illegal action
         return redirect(reverse('quiz:quizzes', args=[subject_id, subject_slug]))
 
