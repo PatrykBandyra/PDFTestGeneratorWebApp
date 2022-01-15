@@ -115,4 +115,4 @@ GitHub.sublime-settings
 !.vscode/extensions.json 
 .history
 /generator/generator/config.json
-#/generator/static/
+/generator/static/
