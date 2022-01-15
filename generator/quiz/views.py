@@ -444,16 +444,17 @@ def add_question_to_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, 
 @login_required
 @require_http_methods(['GET'])
 def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
-    quiz = get_object_or_404(Quiz, id=quiz_id)
-    quiz_questions = quiz.quiz_questions.order_by('-order').all()
-    questions_ids = [quiz_question.question.id for quiz_question in quiz_questions]
-    questions = Question.objects.filter(id__in=questions_ids).order_by('question_quizzes__order').all()
+    # Can't test it out, quiz/css/pdf.css not found
+    quiz = get_object_or_404(Quiz, id=quiz_id)                                                              # pragma: no cover
+    quiz_questions = quiz.quiz_questions.order_by('-order').all()                                           # pragma: no cover
+    questions_ids = [quiz_question.question.id for quiz_question in quiz_questions]                         # pragma: no cover
+    questions = Question.objects.filter(id__in=questions_ids).order_by('question_quizzes__order').all()     # pragma: no cover
 
-    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, 'questions': questions})
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'filename_{quiz_slug}.pdf'
-    weasyprint.HTML(string=html).write_pdf(response, stylesheets=[
-        weasyprint.CSS(settings.STATIC_ROOT + 'quiz/css/pdf.css')
-    ])
+    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, 'questions': questions})                   # pragma: no cover
+    response = HttpResponse(content_type='application/pdf')                                                 # pragma: no cover
+    response['Content-Disposition'] = f'filename_{quiz_slug}.pdf'                                           # pragma: no cover
+    weasyprint.HTML(string=html).write_pdf(response, stylesheets=[                                          # pragma: no cover
+        weasyprint.CSS(settings.STATIC_ROOT + 'quiz/css/pdf.css')                                           # pragma: no cover
+    ])                                                                                                      # pragma: no cover
 
-    return response
+    return response                                                                                         # pragma: no cover
