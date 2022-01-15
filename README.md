@@ -34,9 +34,14 @@ sudo -u postgres psql -c "ALTER ROLE testgenerator SUPERUSER;"
 ```batch
 sudo -u postgres psql testgenerator -c "CREATE EXTENSION pg_trgm"
 ``` 
+- pobrać, dostosować plik *config.json* oraz umieścić go w lokalizacji *generator/* oraz *generator/generator/*
 - zmigrować bazę danych za pomocą skryptu:
 ```batch
 python3 generator/manage.py migrate
+```
+- zebrać wszystkie statyczne pliki do jednej lokalizacji
+```batch
+python3 generator/manage.py collectstatic
 ```
 
 *Polecenia dostosowane do systemu Ubuntu 20.04 LTS*
