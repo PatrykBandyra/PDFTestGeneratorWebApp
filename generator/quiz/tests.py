@@ -441,13 +441,13 @@ class QuizViewsTests(TestCase):
 
         
 
-    # def test_quiz_get_pdf(self):
-    #     request = self.factory.post(reverse('quiz:create-quiz', args=[self.subject.id, self.subject.slug]), data={'name': 'new quiz', 'author': self.user, 'subject': self.subject, 'tags': 'blah'})
-    #     request.user = self.user
-    #     response = create_quiz(request, self.subject.id, self.subject.slug)
-    #     quiz = Quiz.objects.all().first()
+    def test_quiz_get_pdf(self):
+        request = self.factory.post(reverse('quiz:create-quiz', args=[self.subject.id, self.subject.slug]), data={'name': 'new quiz', 'author': self.user, 'subject': self.subject, 'tags': 'blah'})
+        request.user = self.user
+        response = create_quiz(request, self.subject.id, self.subject.slug)
+        quiz = Quiz.objects.all().first()
 
-    #     request = self.factory.get(reverse('quiz:quiz-pdf', args=[self.subject.id, self.subject.slug, quiz.id, quiz.slug]))
-    #     request.user = self.user
-    #     response = quiz_pdf(request, self.subject.id, self.subject.slug, quiz.id, quiz.slug)
-    #     self.assertEqual(response.status_code, 200)
+        request = self.factory.get(reverse('quiz:quiz-pdf', args=[self.subject.id, self.subject.slug, quiz.id, quiz.slug]))
+        request.user = self.user
+        response = quiz_pdf(request, self.subject.id, self.subject.slug, quiz.id, quiz.slug)
+        self.assertEqual(response.status_code, 200)
