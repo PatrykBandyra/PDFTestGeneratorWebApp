@@ -165,7 +165,7 @@ def edit_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug):
 
             quiz.save()
 
-            ret = request.GET.get('ret')
+            ret = request.POST.get('ret')
             if ret:
                 return redirect(ret)
 
