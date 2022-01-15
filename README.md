@@ -59,3 +59,20 @@ firefox -new-tab "http://127.0.0.1:8000/"
 ```
 
 *Polecenia dostosowane do systemu Ubuntu 20.04 LTS*
+
+### Testowanie:
+Należy:
+- uruchomić wykonywanie testów:
+```batch
+coverage run --source='.' --omit='*.tests.py' generator\manage.py test generator account questions quiz
+```
+- wygenerować rezultaty:
+```batch
+coverage html
+```
+- uruchomić przeglądarkę internetową i otworzyć plik htmlcov/index.html
+```batch
+firefox -new-tab "htmlcov/index.html"
+```
+
+*Polecenia dostosowane do systemu Ubuntu 20.04 LTS*
