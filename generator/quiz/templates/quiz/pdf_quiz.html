@@ -4,6 +4,9 @@
 {% for question, answer in answers.items %}
 <h5>{{ forloop.counter }}</h5>
 <p>{{ question.question }}</p>
-{% for a in answer %}
-<p>{{a.answer}}</p>
-{% endfor %} {% endfor %}
+<ul style="list-style-type:circle">
+    {% for a in answer %}
+    <li>{{a.answer}} </li>
+    {% endfor %}
+</ul>
+{% endfor %}
