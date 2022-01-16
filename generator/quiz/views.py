@@ -453,8 +453,8 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     for question in questions:
         answers[question] = Answer.objects.filter(question__id=question.id).all()
     html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, 'questions': questions, "answers":answers})
-    html = html.replace("&lt;p&gt;", "")
-    html = html.replace("&lt;/p&gt;", "")
+    html = html.replace("&lt;", "<")
+    html = html.replace("&gt;", ">")
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'filename_{quiz_slug}.pdf'
     weasyprint.HTML(string=html).write_pdf(response, stylesheets=[
