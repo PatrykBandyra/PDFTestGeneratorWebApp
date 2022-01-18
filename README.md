@@ -64,7 +64,7 @@ firefox -new-tab "http://127.0.0.1:8000/"
 Należy:
 - uruchomić wykonywanie testów:
 ```batch
-coverage run --source='.' --omit='*.tests.py' generator\manage.py test generator account questions quiz
+coverage run --source='.' --omit='*.tests.py' generator/manage.py test generator account questions quiz
 ```
 - wygenerować rezultaty:
 ```batch
