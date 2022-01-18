@@ -1,6 +1,7 @@
 import random
 import re
 import tempfile
+import os
 
 import weasyprint
 from sympy import preview
@@ -17,6 +18,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from taggit.models import Tag
 from questions.models import Answer
+from generator.settings import MEDIA_ROOT, MEDIA_URL
 
 from questions.forms import SearchForm, SearchTagForm
 from questions.models import Subject, Question
@@ -462,11 +464,12 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     p = 0
     while (i := html.find(span_tex)) != -1:
         j = html.find(span_)
-        tex = html[i + len(span_tex):j]
-        html = html.replace(span_tex + tex + span_, f'<img src="{{% static "/quiz/static/{quiz_id}/{p}.png" %}}" alt="">', 1)   
-        tex = tex[2:-2]
+        original_tex = html[i + len(span_tex):j]
+        tex = original_tex[2:-2]
         tex = "$$" + tex + "$$"
-        preview(tex, viewer="file", filename=f"/quiz/static/{quiz_id}/{p}.png", euler=False)
+        os.makedirs(os.path.join(MEDIA_ROOT, str(quiz_id)), exist_ok=True)
+        preview(tex, viewer="file", filename=f"{os.path.join(MEDIA_ROOT, str(quiz_id), f'{p}.png')}", euler=False)
+        html = html.replace(span_tex + original_tex + span_, f'<img src="file://{os.path.realpath(os.path.join(MEDIA_URL[1:], str(quiz_id), f"{p}.png"))}" alt="{p}">', 1)   
         p += 1
 
 
@@ -476,5 +479,7 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     weasyprint.HTML(string=html).write_pdf(response, stylesheets=[
         weasyprint.CSS(settings.STATIC_ROOT + 'quiz/css/pdf.css')
     ])
-
+    for f in os.listdir(os.path.join(MEDIA_ROOT, str(quiz_id))):
+        os.remove(os.path.join(MEDIA_ROOT, str(quiz_id), f))
+    # os.rmdir(os.path.join(MEDIA_ROOT, str(quiz_id)))
     return response

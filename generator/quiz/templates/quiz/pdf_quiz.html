@@ -1,6 +1,5 @@
 <h3>{{ quiz.subject.name }}</h3>
 <h3>{{ quiz.name }}</h3>
-{% load static %}
 {% for question, answer in answers.items %}
 <h5>{{ forloop.counter }}</h5>
 <p>{{ question.question }}</p>
