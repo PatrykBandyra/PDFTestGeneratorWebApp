@@ -3,6 +3,7 @@ import re
 import tempfile
 
 import weasyprint
+from sympy import preview
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity, SearchQuery, SearchVector, SearchRank
@@ -452,9 +453,24 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     answers = {}
     for question in questions:
         answers[question] = Answer.objects.filter(question__id=question.id).all()
-    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, 'questions': questions, "answers":answers})
+    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, "answers":answers})
     html = html.replace("&lt;", "<")
     html = html.replace("&gt;", ">")
+    html = html.replace("&nbsp;", "\xA0")
+    span_tex = '<span class=&quot;math-tex&quot;>'
+    span_ = '</span>'
+    p = 0
+    while (i := html.find(span_tex)) != -1:
+        j = html.find(span_)
+        tex = html[i + len(span_tex):j]
+        html = html.replace(span_tex + tex + span_, f'<img src="{{% static "/quiz/static/{quiz_id}/{p}.png" %}}" alt="">', 1)   
+        tex = tex[2:-2]
+        tex = "$$" + tex + "$$"
+        preview(tex, viewer="file", filename=f"/quiz/static/{quiz_id}/{p}.png", euler=False)
+        p += 1
+
+
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'filename_{quiz_slug}.pdf'
     weasyprint.HTML(string=html).write_pdf(response, stylesheets=[
