@@ -485,7 +485,8 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     weasyprint.HTML(string=html).write_pdf(response, stylesheets=[
         weasyprint.CSS(settings.STATIC_ROOT + 'quiz/css/pdf.css')
     ])
-    for f in os.listdir(os.path.join(MEDIA_ROOT, str(quiz_id))):
-        os.remove(os.path.join(MEDIA_ROOT, str(quiz_id), f))
-    # os.rmdir(os.path.join(MEDIA_ROOT, str(quiz_id)))
+    if p:
+        for f in os.listdir(os.path.join(MEDIA_ROOT, str(quiz_id))):
+            os.remove(os.path.join(MEDIA_ROOT, str(quiz_id), f))
+        # os.rmdir(os.path.join(MEDIA_ROOT, str(quiz_id)))
     return response
