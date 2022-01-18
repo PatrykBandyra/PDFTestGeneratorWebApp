@@ -456,11 +456,17 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     for question in questions:
         answers[question] = Answer.objects.filter(question__id=question.id).all()
     html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, "answers":answers})
-    html = html.replace("&lt;", "<")
-    html = html.replace("&gt;", ">")
-    html = html.replace("&nbsp;", "\xA0")
-    span_tex = '<span class=&quot;math-tex&quot;>'
-    span_ = '</span>'
+    html = html.replace("&lt;p&gt;", "<p>")
+    html = html.replace("&lt;/p&gt;", "</p>")
+    html = html.replace("&lt;pre&gt;", "<pre>")
+    html = html.replace("&lt;/pre&gt;", "</pre>")
+    while (i := html.find("&lt;code")) != -1:
+        html = html[:i] + html[i:].replace("&gt;", ">", 1)
+        html = html.replace("&lt;code", "<code", 1)
+    html = html.replace("&lt;/code&gt;", "</code>")
+    html = html.replace("&amp;nbsp;", "&nbsp;")
+    span_tex = '&lt;span class=&quot;math-tex&quot;&gt;'
+    span_ = '&lt;/span&gt;'
     p = 0
     while (i := html.find(span_tex)) != -1:
         j = html.find(span_)
