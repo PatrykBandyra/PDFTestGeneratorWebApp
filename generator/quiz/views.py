@@ -455,6 +455,8 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     answers = {}
     for question in questions:
         answers[question] = Answer.objects.filter(question__id=question.id).all()
+        for answer in answers[question]:
+            answer.answer = answer.answer[3:-4]
     html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, "answers":answers})
     html = html.replace("&lt;p&gt;", "<p>")
     html = html.replace("&lt;/p&gt;", "</p>")
@@ -481,7 +483,7 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
 
 
     response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'filename_{quiz_slug}.pdf'
+    response['Content-Disposition'] = f'inline; filename_{quiz_slug}.pdf'
     weasyprint.HTML(string=html).write_pdf(response, stylesheets=[
         weasyprint.CSS(settings.STATIC_ROOT + 'quiz/css/pdf.css')
     ])

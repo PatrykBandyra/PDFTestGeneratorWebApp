@@ -1,11 +1,16 @@
+<p>........................................................................</p>
+<small>Imię, nazwisko, nr indeksu</small>
 <h3>{{ quiz.subject.name }}</h3>
 <h3>{{ quiz.name }}</h3>
+<ol>
 {% for question, answer in answers.items %}
-<h5>{{ forloop.counter }}</h5>
-<p>{{ question.question }}</p>
-<ul style="list-style-type:circle">
+<li>
+<h4>{{question.question}}</h4>
+<ul style="list-style-type: none; padding: 0px;">
     {% for a in answer %}
-    <li>{{a.answer}} </li>
+    <li>&#9633  {{a.answer}} </li>
     {% endfor %}
 </ul>
+</li>
 {% endfor %}
+</ol>
