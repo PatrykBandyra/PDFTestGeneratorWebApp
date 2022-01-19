@@ -15,6 +15,10 @@
 ### Instalacja
 
 Należy:
+- zainstalować pakiety
+```batch
+sudo apt install python3 python3-pip postgresql texlive texlive-latex-extra texlive-fonts-recommended dvipng cm-super
+```
 - zainstalować za pomocą instalatora pakietów, np. pip, pakiety wymienione w pliku requirements.txt
 ```batch
 pip install -r requirements.txt
@@ -64,7 +68,7 @@ firefox -new-tab "http://127.0.0.1:8000/"
 Należy:
 - uruchomić wykonywanie testów:
 ```batch
-coverage run --source='.' --omit='*.tests.py' generator\manage.py test generator account questions quiz
+coverage run --source='.' --omit='*.tests.py' generator/manage.py test generator account questions quiz
 ```
 - wygenerować rezultaty:
 ```batch
