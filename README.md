@@ -15,6 +15,10 @@
 ### Instalacja
 
 Należy:
+- zainstalować pakiety
+```batch
+sudo apt install python3 python3-pip postgresql texlive texlive-latex-extra texlive-fonts-recommended dvipng cm-super
+```
 - zainstalować za pomocą instalatora pakietów, np. pip, pakiety wymienione w pliku requirements.txt
 ```batch
 pip install -r requirements.txt
