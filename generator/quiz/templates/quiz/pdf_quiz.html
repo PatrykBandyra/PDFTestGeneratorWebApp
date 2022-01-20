@@ -2,17 +2,17 @@
 <small>Imię, nazwisko, nr indeksu ........................................................................</small>
 <h3 class="subject-name">{{ quiz.subject.name }}</h3>
 <h3 class="test-name">{{ quiz.name }}</h3>
-<ol>
-    <br>
-    {% for question, answer in answers.items %}
-        <li>
-            <h4>{{ question.question }}</h4>
-            <ul style="list-style-type: none; padding: 0;">
-                {% for a in answer %}
-                    <li>&#9633 {{ a.answer }} </li>
-                {% endfor %}
-            </ul>
-        </li>
-    {% endfor %}
-</ol>
+{% for question, answer in answers.items %}
+    <div>
+        {{ forloop.counter }}
+    </div>
+    <div>
+        <h4>{{ question.question }}</h4>
+        <ul style="list-style-type: none; padding: 0;">
+            {% for a in answer %}
+                <li>&#9633 {{ a.answer }} </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endfor %}
 </body>
