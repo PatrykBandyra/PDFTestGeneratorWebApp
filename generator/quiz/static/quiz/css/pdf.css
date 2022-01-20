@@ -1,5 +1,6 @@
 body {
     font-weight: normal;
+    break-inside: auto;
 }
 
 .subject-name {
