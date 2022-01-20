@@ -55,17 +55,6 @@
                                             {{ answer_form.is_right }}
                                         </div>
 
-                                        <p class="text-danger">
-                                            {% for e in answer_form.order.errors %}
-                                                {{ e }}
-                                            {% endfor %}
-                                        </p>
-                                        <div class="form-outline form-white mb-4">
-                                            <p class="text-light">Answer ordinal number</p>
-                                            {{ answer_form.order }}
-                                        </div>
-                                    </div>
-
                                     {% csrf_token %}
                                     <button class="btn btn-outline-light btn-lg px-5 mt-3" type="submit">
                                         Create Answer
