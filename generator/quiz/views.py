@@ -1,10 +1,8 @@
+import os
 import random
 import re
-import tempfile
-import os
 
 import weasyprint
-from sympy import preview
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.postgres.search import TrigramSimilarity, SearchQuery, SearchVector, SearchRank
@@ -16,11 +14,12 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
+from sympy import preview
 from taggit.models import Tag
-from questions.models import Answer
-from generator.settings import MEDIA_ROOT, MEDIA_URL
 
+from generator.settings import MEDIA_ROOT, MEDIA_URL
 from questions.forms import SearchForm, SearchTagForm
+from questions.models import Answer
 from questions.models import Subject, Question
 from questions.utils import is_author_of_subject
 from .forms import QuizCreationForm
@@ -509,5 +508,4 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     if p:
         for f in os.listdir(os.path.join(MEDIA_ROOT, str(quiz_id))):
             os.remove(os.path.join(MEDIA_ROOT, str(quiz_id), f))
-        # os.rmdir(os.path.join(MEDIA_ROOT, str(quiz_id)))
     return response
