@@ -226,11 +226,9 @@ CKEDITOR_CONFIGS = {
         'skin': 'moono-lisa',
         'toolbar': 'Custom',
         'toolbar_Custom': [
-            ['Styles', 'Format', 'Font', 'FontSize'],
             ['Bold', 'Italic', 'Underline', 'Strike'],
             ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Indent', 'Outdent'],
-            ['TextColor', 'BGColor'],
-            ['NumberedList', 'BulletedList', 'Table'],
+            ['NumberedList', 'BulletedList'],
             ['CodeSnippet', 'Mathjax'],
             ['Undo', 'Redo']
         ],
