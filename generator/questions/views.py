@@ -294,15 +294,13 @@ def edit_answer(request, subject_id, subject_slug, question_id, answer_id):
         if request.method == 'POST':
             answer_form = AnswerCreationForm(data=request.POST)
             if answer_form.is_valid():
-                question = get_object_or_404(Question, id=question_id)
-                # Check for a unique constraint (Question, order)
-                if is_answer_unique_constraint_fulfilled(question, answer_form.cleaned_data['order']):
-                    answer_edited = get_object_or_404(Answer, id=answer_id)
-                    answer_edited.answer = answer_form.cleaned_data['answer']
-                    answer_edited.is_right = answer_form.cleaned_data['is_right']
-                    answer_edited.order = answer_form.cleaned_data['order']
-                    answer_edited.save()
-                    return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
+                # question = get_object_or_404(Question, id=question_id)
+                answer_edited = get_object_or_404(Answer, id=answer_id)
+                answer_edited.answer = answer_form.cleaned_data['answer']
+                answer_edited.is_right = answer_form.cleaned_data['is_right']
+
+                answer_edited.save()
+                return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
                 # else:
                 #     # Return error to a template
                 #     answer_form.add_error('order', 'Choose other ordinal number. '
