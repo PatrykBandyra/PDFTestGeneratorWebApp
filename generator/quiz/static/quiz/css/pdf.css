@@ -6,11 +6,12 @@ body {
 .subject-name {
     font-weight: bold;
     size: 45px;
+    text-align: center;
 }
 
 .test-name {
-    font-weight: bold;
-    size: 45px;
+    size: 35px;
+    text-align: center;
 }
 
 h4 {
