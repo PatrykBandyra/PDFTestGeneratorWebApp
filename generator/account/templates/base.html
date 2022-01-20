@@ -112,27 +112,6 @@
                             </a>
                         </div>
 
-                        <div class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" role="button" id="sub-menu" data-mdb-toggle="dropdown">
-                                Subjects
-                            </a>
-                            <ul class="dropdown-menu">
-                                {% for subject in subjects %}
-                                    <li><a href="{{ subject.get_absolute_url }}"
-                                           class="dropdown-item">{{ subject.name }}</a></li>
-                                {% endfor %}
-                            </ul>
-
-                        </div>
-
-                        <div class="nav-item">
-                            <a href="#" class="nav-link">People</a>
-                        </div>
-
-                        <div class="nav-item">
-                            <a href="#" class="nav-link">Help</a>
-                        </div>
-
                     </div>
 
                     {# NAVBAR RIGHT SIDE ------------------------------------------------------------------------------------------------ #}
