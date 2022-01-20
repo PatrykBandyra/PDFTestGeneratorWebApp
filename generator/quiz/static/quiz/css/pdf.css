@@ -10,3 +10,6 @@
 h4 {
     font-weight : normal; 
 }
+@page {
+    margin: 15mm;
+}
