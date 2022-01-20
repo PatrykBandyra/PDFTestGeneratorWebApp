@@ -227,7 +227,6 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'Custom',
         'toolbar_Custom': [
             ['Bold', 'Italic', 'Underline', 'Strike'],
-            ['JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Indent', 'Outdent'],
             ['NumberedList', 'BulletedList'],
             ['CodeSnippet', 'Mathjax'],
             ['Undo', 'Redo']
