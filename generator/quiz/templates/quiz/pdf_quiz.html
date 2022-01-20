@@ -3,6 +3,7 @@
 <h3 class="subject-name">{{ quiz.subject.name }}</h3>
 <h3 class="test-name">{{ quiz.name }}</h3>
 <ol>
+    <br>
     {% for question, answer in answers.items %}
         <li>
             <h4>{{ question.question }}</h4>
