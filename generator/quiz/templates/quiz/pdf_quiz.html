@@ -8,10 +8,8 @@
             <h4>{{ question.question }}</h4>
             <ul style="list-style-type: none; padding: 0;">
                 {% for a in answer %}
-                    {% if show_answers %}
-                        {% if a.is_right %}
-                            <li>&#9632 {{ a.answer }} </li>
-                        {% endif %}
+                    {% if show_answers and a.is_right %}
+                        <li>&#9632 {{ a.answer }} </li>
                     {% else %}
                         <li>&#9633 {{ a.answer }} </li>
                     {% endif %}
