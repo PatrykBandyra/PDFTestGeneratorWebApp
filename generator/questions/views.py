@@ -269,7 +269,7 @@ def add_answer(request, subject_id, subject_slug, question_id):
                 if is_answer_unique_constraint_fulfilled(question, answer_form.cleaned_data['order']):
                     new_answer.save()
 
-                return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
+            return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
                 # else:
                 #     # Return error to a template
                 #     answer_form.add_error('order', 'Choose other ordinal number. '
