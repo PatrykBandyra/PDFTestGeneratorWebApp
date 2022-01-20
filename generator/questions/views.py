@@ -265,6 +265,8 @@ def add_answer(request, subject_id, subject_slug, question_id):
                 new_answer = answer_form.save(commit=False)
                 question = get_object_or_404(Question, id=question_id)
                 ordinal_num = question.answers.all().order_by('-order').first().order + 1
+                if not ordinal_num:
+                    ordinal_num = 1
                 new_answer.question = question
                 new_answer.order = ordinal_num
                 new_answer.save()
@@ -294,20 +296,12 @@ def edit_answer(request, subject_id, subject_slug, question_id, answer_id):
         if request.method == 'POST':
             answer_form = AnswerCreationForm(data=request.POST)
             if answer_form.is_valid():
-                # question = get_object_or_404(Question, id=question_id)
                 answer_edited = get_object_or_404(Answer, id=answer_id)
                 answer_edited.answer = answer_form.cleaned_data['answer']
                 answer_edited.is_right = answer_form.cleaned_data['is_right']
 
                 answer_edited.save()
-                return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
-                # else:
-                #     # Return error to a template
-                #     answer_form.add_error('order', 'Choose other ordinal number. '
-                #                                    'This one has been already assigned to a different answer of this '
-                #                                    'question.')
-                #     return render(request, 'questions/question_edit_answer.html', {'answer_form': answer_form,
-                #                                                                    'question': question})
+            return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
 
         else:  # GET
             question = get_object_or_404(Question, id=question_id)
