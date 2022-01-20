@@ -4,11 +4,17 @@
 <h3 class="test-name">{{ quiz.name }}</h3>
 <ol>
     {% for question, answer in answers.items %}
-        <li style="margin-top: 3mm">
+        <li>
             <h4>{{ question.question }}</h4>
             <ul style="list-style-type: none; padding: 0;">
                 {% for a in answer %}
-                    <li>&#9633 {{ a.answer }} </li>
+                    {% if show_answers %}
+                        {% if a.is_right %}
+                            <li>&#9632 {{ a.answer }} </li>
+                        {% endif %}
+                    {% else %}
+                        <li>&#9633 {{ a.answer }} </li>
+                    {% endif %}
                 {% endfor %}
             </ul>
         </li>

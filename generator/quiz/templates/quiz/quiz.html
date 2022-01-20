@@ -29,7 +29,12 @@
                         Randomize Question Order
                     </button>
                 </form>
-                <a class="btn btn-primary mt-2 ms-2" href="{% url 'quiz:quiz-pdf' subject.id subject.slug quiz.id quiz.slug %}">
+                <a class="btn btn-primary mt-2 ms-2"
+                   href="{% url 'quiz:quiz-pdf' subject.id subject.slug quiz.id quiz.slug %}?answers=yes">
+                    Print Test With Answers
+                </a>
+                <a class="btn btn-primary mt-2 ms-2"
+                   href="{% url 'quiz:quiz-pdf' subject.id subject.slug quiz.id quiz.slug %}">
                     Print Test
                 </a>
             </div>

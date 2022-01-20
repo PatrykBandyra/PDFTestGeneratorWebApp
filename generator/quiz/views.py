@@ -456,7 +456,13 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
         answers[question] = Answer.objects.filter(question__id=question.id).all()
         for answer in answers[question]:
             answer.answer = answer.answer[3:-4]
-    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, "answers": answers})
+
+    try:
+        show_answers = True if request.GET['answers'] == 'yes' else False
+    except KeyError:
+        show_answers = False
+
+    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, "answers": answers, 'show_answers': show_answers})
     html = html.replace("&lt;p&gt;", "<p>")
     html = html.replace("&lt;/p&gt;", "</p>")
     html = html.replace("&lt;pre&gt;", "<pre>")
