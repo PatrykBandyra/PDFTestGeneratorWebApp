@@ -4,7 +4,7 @@
 <h3 class="test-name">{{ quiz.name }}</h3>
 <ol>
     {% for question, answer in answers.items %}
-        <li>
+        <li style="margin-top: 3mm">
             <h4>{{ question.question }}</h4>
             <ul style="list-style-type: none; padding: 0;">
                 {% for a in answer %}
