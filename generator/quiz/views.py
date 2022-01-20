@@ -467,6 +467,21 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
         html = html.replace("&lt;code", "<code", 1)
     html = html.replace("&lt;/code&gt;", "</code>")
     html = html.replace("&amp;nbsp;", "&nbsp;")
+    html = html.replace("&lt;br/&gt;", "<br/>")
+    html = html.replace("&lt;ol&gt;", "<ol>")
+    html = html.replace("&lt;/ol&gt;", "</ol>")    
+    html = html.replace("&lt;ul&gt;", "<ul>")
+    html = html.replace("&lt;/ul&gt;", "</ul>")
+    html = html.replace("&lt;li&gt;", "<li>")
+    html = html.replace("&lt;/li&gt;", "</li>")    
+    html = html.replace("&lt;b&gt;", "<b>")
+    html = html.replace("&lt;/b&gt;", "</b>")
+    html = html.replace("&lt;i&gt;", "<i>")
+    html = html.replace("&lt;/i&gt;", "</i>")
+    html = html.replace("&lt;u&gt;", "<u>")
+    html = html.replace("&lt;/u&gt;", "</u>")
+    html = html.replace("&lt;s&gt;", "<s>")
+    html = html.replace("&lt;/s&gt;", "</s>")
     span_tex = '&lt;span class=&quot;math-tex&quot;&gt;'
     span_ = '&lt;/span&gt;'
     p = 0
