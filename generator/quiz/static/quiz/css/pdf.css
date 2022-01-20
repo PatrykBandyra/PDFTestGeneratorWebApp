@@ -1,6 +1,4 @@
 body {
-    margin-top: 15mm ;
-    margin-left: 15mm;
     font-weight: normal;
     break-inside: auto;
 }
@@ -20,5 +18,5 @@ h4 {
 }
 
 @page {
-    margin: 15mm;
+    margin: 0;
 }
