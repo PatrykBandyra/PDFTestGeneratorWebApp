@@ -457,7 +457,7 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
         answers[question] = Answer.objects.filter(question__id=question.id).all()
         for answer in answers[question]:
             answer.answer = answer.answer[3:-4]
-    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, "answers":answers})
+    html = render_to_string('quiz/pdf_quiz.html', {'quiz': quiz, "answers": answers})
     html = html.replace("&lt;p&gt;", "<p>")
     html = html.replace("&lt;/p&gt;", "</p>")
     html = html.replace("&lt;pre&gt;", "<pre>")
@@ -477,10 +477,10 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
         tex = "$$" + tex + "$$"
         os.makedirs(os.path.join(MEDIA_ROOT, str(quiz_id)), exist_ok=True)
         preview(tex, viewer="file", filename=f"{os.path.join(MEDIA_ROOT, str(quiz_id), f'{p}.png')}", euler=False)
-        html = html.replace(span_tex + original_tex + span_, f'<img src="file://{os.path.realpath(os.path.join(MEDIA_URL[1:], str(quiz_id), f"{p}.png"))}" alt="{p}">', 1)   
+        html = html.replace(span_tex + original_tex + span_,
+                            f'<img src="file://{os.path.realpath(os.path.join(MEDIA_URL[1:], str(quiz_id), f"{p}.png"))}" alt="{p}">',
+                            1)
         p += 1
-
-
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename_{quiz_slug}.pdf'

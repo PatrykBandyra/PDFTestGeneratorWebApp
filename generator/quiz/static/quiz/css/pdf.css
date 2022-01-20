@@ -1,4 +1,8 @@
-h3 {
-    color: green;
+.subject-name {
+
+}
+
+.test-name {
+    font-weight: bold;
     size: 45px;
 }
