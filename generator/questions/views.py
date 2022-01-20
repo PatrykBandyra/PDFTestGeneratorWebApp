@@ -264,8 +264,10 @@ def add_answer(request, subject_id, subject_slug, question_id):
             if answer_form.is_valid():
                 new_answer = answer_form.save(commit=False)
                 question = get_object_or_404(Question, id=question_id)
-                ordinal_num = question.answers.all().order_by('-order').first().order + 1
-                if not ordinal_num:
+                answers = question.answers.all()
+                if answers:
+                    ordinal_num = answers.order_by('-order').first().order + 1
+                else:
                     ordinal_num = 1
                 new_answer.question = question
                 new_answer.order = ordinal_num
