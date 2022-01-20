@@ -64,7 +64,6 @@ class Answer(models.Model):
         return f'ID: {self.id}, QUESTION ID: {self.question.id}'
 
     class Meta:
-        # unique_together = ('question', 'order')
         required_db_features = {
             'supports_deferrable_unique_constraints'
         }

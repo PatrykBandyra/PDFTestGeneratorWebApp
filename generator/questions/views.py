@@ -264,18 +264,14 @@ def add_answer(request, subject_id, subject_slug, question_id):
             if answer_form.is_valid():
                 new_answer = answer_form.save(commit=False)
                 question = get_object_or_404(Question, id=question_id)
+                ordinal_num = question.answers.all().order_by('-order').first().order + 1
                 new_answer.question = question
+                new_answer.order = ordinal_num
                 # Check for a unique constraint (Question, order)
                 if is_answer_unique_constraint_fulfilled(question, answer_form.cleaned_data['order']):
                     new_answer.save()
 
             return redirect(get_object_or_404(Question, id=question_id).get_absolute_url())
-                # else:
-                #     # Return error to a template
-                #     answer_form.add_error('order', 'Choose other ordinal number. '
-                #                                    'This one has been already assigned to a different answer of this '
-                #                                    'question.')
-                #     return render(request, 'questions/question_add_answer.html', {'answer_form': answer_form})
 
         else:  # GET
             # Default value of order - next int

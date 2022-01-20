@@ -37,7 +37,7 @@ class AnswerCreationForm(forms.ModelForm):
 
     class Meta:
         model = Answer
-        fields = ('answer', 'is_right', 'order')
+        fields = ('answer', 'is_right')
 
 
 class SearchForm(forms.Form):
