@@ -67,7 +67,8 @@ def quizzes(request, subject_id, subject_slug, tag_slug=None):
                 # quiz.id = None
                 # quiz.save()
 
-            except Exception:
+            except Exception as e:
+                print(e)
                 return redirect('account:dashboard')
 
     # GET/POST
