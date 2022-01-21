@@ -1,6 +1,7 @@
 import re
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.contrib.postgres.search import TrigramSimilarity, SearchVector, SearchQuery, SearchRank
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import transaction
@@ -8,13 +9,10 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.views.decorators.http import require_http_methods
 from taggit.models import Tag
-from django.contrib.auth.models import User
-from django.db.models.query import QuerySet
 
 from .forms import SubjectCreationForm, QuestionCreationForm, AnswerCreationForm, SearchForm, SearchTagForm
 from .models import Subject, Question, Answer
-from .utils import (is_author_of_subject, is_owner_of_subject, is_author_of_question,
-                    is_answer_unique_constraint_fulfilled)
+from .utils import (is_author_of_subject, is_owner_of_subject, is_author_of_question)
 
 
 @login_required

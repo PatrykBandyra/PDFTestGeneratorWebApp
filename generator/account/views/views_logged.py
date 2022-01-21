@@ -1,12 +1,11 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import PasswordChangeView
-from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-from questions.models import Subject
 from django.views.decorators.http import require_http_methods
 
 from account.forms import CustomChangePasswordForm
+from questions.models import Subject
 from questions.utils import is_author_of_subject
 
 

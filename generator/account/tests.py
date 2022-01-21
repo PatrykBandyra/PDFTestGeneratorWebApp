@@ -1,12 +1,12 @@
+from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase, RequestFactory
-from django.contrib.auth.models import User, AnonymousUser
-from django.utils.text import slugify
 from django.urls import reverse
 
+from .authentication import *
+from .forms import *
 from .views.views_logged import *
 from .views.views_logging import *
-from .forms import *
-from .authentication import *
+
 
 class ViewsLoggedTests(TestCase):
 
@@ -14,7 +14,7 @@ class ViewsLoggedTests(TestCase):
     def setUpTestData(cls):
         cls.user = User.objects.create_user('Name')
         cls.factory = RequestFactory()
-    
+
     def test_dashboard_get(self):
         request = self.factory.get(reverse("account:dashboard"))
         request.user = self.user
@@ -35,6 +35,7 @@ class ViewsLoggedTests(TestCase):
         request.user = user2
         response = dashboard(request)
         self.assertEqual(Subject.objects.all().first(), subject)
+
 
 class ViewsLoggingTests(TestCase):
 
@@ -62,10 +63,14 @@ class ViewsLoggingTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_register_new(self):
-        request = self.factory.post(reverse("account:register"), data={'username': 'username', 'first_name': 'first_name', 'last_name': 'last_name', 'email': 'username@email.com', 'password1': 'password12341234', 'password2': 'password12341234'})
+        request = self.factory.post(reverse("account:register"),
+                                    data={'username': 'username', 'first_name': 'first_name', 'last_name': 'last_name',
+                                          'email': 'username@email.com', 'password1': 'password12341234',
+                                          'password2': 'password12341234'})
         request.user = self.user
         response = register(request)
         self.assertEqual(response.status_code, 200)
+
 
 class FormsTests(TestCase):
 
@@ -79,6 +84,7 @@ class FormsTests(TestCase):
         form_reset_password_confirm = CustomResetPasswordConfirmForm(self.user)
         form_change_password = CustomChangePasswordForm(self.user)
         form_login = CustomLoginForm(self.user)
+
 
 class AuthenticationTests(TestCase):
 

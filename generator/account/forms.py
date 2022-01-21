@@ -1,12 +1,11 @@
-from django import forms
-from django.contrib.auth.models import User
+from captcha.fields import ReCaptchaField
+from captcha.widgets import ReCaptchaV2Checkbox
 from django.contrib.auth.forms import (AuthenticationForm,
                                        PasswordChangeForm,
                                        PasswordResetForm,
                                        SetPasswordForm,
                                        UserCreationForm)
-from captcha.fields import ReCaptchaField
-from captcha.widgets import ReCaptchaV2Checkbox
+from django.contrib.auth.models import User
 
 
 class CustomLoginForm(AuthenticationForm):

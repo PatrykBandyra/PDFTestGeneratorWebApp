@@ -1,6 +1,3 @@
-from .models import Quiz
-
-
 def is_author_of_quiz(user, quiz_id):
     """
     Checks of a user is an author of a quiz with given id. Only author of a quiz and author of a subject can delete

@@ -1,4 +1,4 @@
-from .models import Question, Answer
+from .models import Answer
 
 
 def is_author_of_subject(user, subject_id):

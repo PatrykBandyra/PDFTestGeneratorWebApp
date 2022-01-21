@@ -1,12 +1,7 @@
 from django.db.utils import IntegrityError
-
-from django.test import TestCase, Client, RequestFactory
-from django.contrib.auth.models import User
+from django.test import TestCase, RequestFactory
 from django.utils.text import slugify
-from django.urls import reverse
 
-from .models import Subject, Question, Answer
-from .utils import *
 from .views import *
 
 
