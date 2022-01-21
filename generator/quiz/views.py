@@ -62,7 +62,7 @@ def quizzes(request, subject_id, subject_slug, tag_slug=None):
                 new_quiz = Quiz.objects.create(name=quiz.name, description=quiz.description, author=quiz.author,
                                                subject=quiz.subject, tags=quiz.tags)
 
-                for qq in quiz.quiz_questions:
+                for qq in quiz.quiz_questions.all():
                     QuizQuestion.objects.create(quiz=new_quiz, question=qq.question, order=qq.order)
                 # quiz.id = None
                 # quiz.save()
