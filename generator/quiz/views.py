@@ -58,8 +58,14 @@ def quizzes(request, subject_id, subject_slug, tag_slug=None):
                     raise Exception
 
                 quiz = Quiz.objects.get(id=quiz_to_copy_id)
-                quiz.id = None
-                quiz.save()
+
+                new_quiz = Quiz.objects.create(name=quiz.name, description=quiz.description, author=quiz.author,
+                                               subject=quiz.subject, tags=quiz.tags)
+
+                for qq in quiz.quiz_questions:
+                    QuizQuestion.objects.create(quiz=new_quiz, question=qq.question, order=qq.order)
+                # quiz.id = None
+                # quiz.save()
 
             except Exception:
                 return redirect('account:dashboard')
@@ -474,11 +480,11 @@ def quiz_pdf(request, subject_id, subject_slug, quiz_id, quiz_slug):
     html = html.replace("&amp;nbsp;", "&nbsp;")
     html = html.replace("&lt;br/&gt;", "<br/>")
     html = html.replace("&lt;ol&gt;", "<ol>")
-    html = html.replace("&lt;/ol&gt;", "</ol>")    
+    html = html.replace("&lt;/ol&gt;", "</ol>")
     html = html.replace("&lt;ul&gt;", "<ul>")
     html = html.replace("&lt;/ul&gt;", "</ul>")
     html = html.replace("&lt;li&gt;", "<li>")
-    html = html.replace("&lt;/li&gt;", "</li>")    
+    html = html.replace("&lt;/li&gt;", "</li>")
     html = html.replace("&lt;b&gt;", "<b>")
     html = html.replace("&lt;/b&gt;", "</b>")
     html = html.replace("&lt;i&gt;", "<i>")
