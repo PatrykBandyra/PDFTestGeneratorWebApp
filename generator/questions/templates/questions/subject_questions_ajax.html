@@ -47,6 +47,25 @@
                     {% endif %}
                 {% endfor %}
 
+                <div class="d-flex justify-content-between border-top border-dark mt-2">
+                    <div>
+                        Created:
+                        {{ question.created }}
+                    </div>
+                    <div>
+                        Edited:
+                        {{ question.edited }}
+                    </div>
+                    <div>
+                        Used:
+                        {% if question.last_use %}
+                            {{ question.last_use }}
+                        {% else %}
+                            Never
+                        {% endif %}
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

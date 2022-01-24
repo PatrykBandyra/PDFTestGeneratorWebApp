@@ -1,6 +1,7 @@
 import os
 import random
 import re
+import datetime
 
 import weasyprint
 from django.conf import settings
@@ -357,7 +358,7 @@ def add_question_to_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, 
                 question_id = int(request.POST.get('add'))
                 if not is_author_of_quiz(request.user, quiz_id) and \
                         not is_author_of_subject(request.user, subject_id):
-                    raise Exception
+                    raise Exception('No authority')
 
                 quiz = get_object_or_404(Quiz, id=quiz_id)
                 question = get_object_or_404(Question, id=question_id)
@@ -366,9 +367,11 @@ def add_question_to_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, 
                     order = qq.order
                 else:  # First question in quiz
                     order = 0
-                QuizQuestion.objects.create(quiz=quiz, question=question, order=order + 1)
-            except Exception:
-                pass
+                new_quiz_question = QuizQuestion.objects.create(quiz=quiz, question=question, order=order + 1)
+                new_quiz_question.question.last_use = datetime.datetime.now()
+                new_quiz_question.question.save()
+            except Exception as e:
+                print(e)
 
         question_ids = request.POST.get('add_all')
         if question_ids:
@@ -389,8 +392,9 @@ def add_question_to_quiz(request, subject_id, subject_slug, quiz_id, quiz_slug, 
                         order = qq.order
                     else:
                         order = 0
-                    QuizQuestion.objects.create(quiz=quiz, question=question, order=order + 1)
-
+                    new_quiz_question = QuizQuestion.objects.create(quiz=quiz, question=question, order=order + 1)
+                    new_quiz_question.question.last_use = datetime.datetime.now()
+                    new_quiz_question.question.save()
             except Exception:
                 pass
 
