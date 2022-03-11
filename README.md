@@ -1,8 +1,4 @@
-# PZSP2
-
-### Temat projektu:
-
-- Generator testów
+# PDF Test Generator
 
 ### Instalacja
 
